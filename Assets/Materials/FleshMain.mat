@@ -41,16 +41,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BigCellDens: 4
-    - _GNoiseScale: 1
-    - _PixelationFactor: 0.11
+    - _BigCellDens: 1
+    - _GNoiseScale: 1.01
+    - _PixelationFactor: 0.12
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _SNoiseScale: 2
-    - _SmallCellDens: 0.1
+    - _SNoiseScale: 1
+    - _SmallCellDens: 5
     - _rot: 22.41
     m_Colors:
-    - _SnoiseOffset: {r: 0, g: 0, b: 0, a: 0}
+    - _SnoiseOffset: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &4733061689386580147
 MonoBehaviour:
