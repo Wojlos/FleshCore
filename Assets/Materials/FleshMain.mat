@@ -43,12 +43,12 @@ Material:
     m_Floats:
     - _BigCellDens: 1
     - _GNoiseScale: 1.01
-    - _PixelationFactor: 0.12
+    - _PixelationFactor: 0.00001
     - _QueueControl: 0
     - _QueueOffset: 0
     - _SNoiseScale: 1
     - _SmallCellDens: 5
-    - _rot: 22.41
+    - _rot: 0.1
     m_Colors:
     - _SnoiseOffset: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
