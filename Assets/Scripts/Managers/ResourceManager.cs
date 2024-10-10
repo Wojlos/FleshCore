@@ -8,7 +8,8 @@ public enum ResourceType
     {
         Blood,
         Scabs,
-        Lipids
+        Lipids,
+        Bone
     }
 
 [System.Serializable]
@@ -126,7 +127,10 @@ public class ResourceManager : MonoBehaviour
     }
 
     public void IncrementResourceProduction(ResourceType type, int amount)
-    {
+    {   
+        if(resourceDictionary == null) return;
+        
+        
         if (resourceDictionary.ContainsKey(type))
         {
             resourceDictionary[type].currentProduction += amount;
@@ -136,6 +140,7 @@ public class ResourceManager : MonoBehaviour
 
     public void IncrementResourceUsage(ResourceType type, int amount)
     {
+        
         if (resourceDictionary.ContainsKey(type))
         {
             resourceDictionary[type].currentUsage += amount;

@@ -3,15 +3,16 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Building
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Enemy
   - Water
   - UI
-  - 
+  - Roads
   - 
   - 
   - 
@@ -38,6 +39,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Paralax
+    uniqueID: 1848421027
+    locked: 0
+  - name: Roads
+    uniqueID: 1017577667
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
