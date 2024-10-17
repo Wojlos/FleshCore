@@ -7,9 +7,9 @@ public class SetupBone : MonoBehaviour
     [SerializeField]
     private float darken = 0.129f;
 	[SerializeField]
-	private float cellDensity = 2f;
+	private float borderTilling = 2f;
     [SerializeField]
-	private Vector3 boneBorders = new Vector3(2f,4f,6f);
+	private float mainTilling = 2f;
     
     private Material material;
 
@@ -20,9 +20,8 @@ public class SetupBone : MonoBehaviour
      void FixedUpdate()
     {
         material.SetFloat("_Darken", darken);
-		material.SetFloat("_CellDensity", cellDensity);
-		material.SetVector("_BoneBorders", boneBorders);
-
+		material.SetFloat("_MainTiling", mainTilling);
+		material.SetFloat("_BorderTiling", borderTilling);
         
     }
 }

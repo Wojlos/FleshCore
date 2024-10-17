@@ -28,6 +28,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_edb30f78169743089ef8cb0502b1f390_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: d082601b1ea0d5f42a2e86f87ed02334, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -44,21 +48,21 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _BigCellDens: 1
+    - _BigCellDens: 9.39
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _CastShadows: 1
     - _Cull: 2
     - _Darken: 1
     - _DstBlend: 0
-    - _GNoiseScale: 1
+    - _GNoiseScale: 1.21
     - _PixelationFactor: 0.00001
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _SNoiseScale: 1
-    - _SmallCellDens: 5
-    - _Speed: 0.2
+    - _SmallCellDens: 6.91
+    - _Speed: 0.1
     - _SrcBlend: 1
     - _Surface: 0
     - _WorkflowMode: 1
