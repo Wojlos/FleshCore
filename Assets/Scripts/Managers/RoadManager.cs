@@ -12,6 +12,8 @@ public class RoadManager : MonoBehaviour
 
     [SerializeField] private SplineContainer _splineContainer;
     [SerializeField] private GameObject _preview;
+    [SerializeField] private GameObject _buildButton;
+
     [SerializeField] private GameObject _junctionPrefab;
     [SerializeField] [Range(0.001f,1f)] private float _proximityFactor = 0.01f;
     [SerializeField] [Range(0.001f,1f)] private float _clampDistance = 0.5f;
@@ -48,6 +50,10 @@ public class RoadManager : MonoBehaviour
             // var baseKnot = _baseJunction.GetKnot();
             // currentKnot.Position = _previewContainer.transform.InverseTransformPoint(_baseJunction.transform.position);
             var currentKnot = _baseJunction.GetKnot();
+            _buildButton.transform.position = _previewContainer.transform.TransformPoint(
+                _previewContainer.Splines[0][_previewContainer.Splines[0].Count-2].Position
+            );
+
             currentKnot.Position = _previewContainer.transform.InverseTransformPoint(_baseJunction.transform.position);
 
             // _previewContainer.Splines[0].SetKnot(0, baseKnot);
@@ -110,7 +116,6 @@ public class RoadManager : MonoBehaviour
                 _splineContainer.Splines[closestSpline].Insert((int)Mathf.Ceil(knotIdx), knot);
                 UpdateSpline(closestSpline);
                 _splineContainer.LinkKnots(knotNext, mainKnot);
-
             }
         }
     }
@@ -119,10 +124,13 @@ public class RoadManager : MonoBehaviour
         _allEntrances.Add(ve);
     }
 
+    public List<VeinEntrance> GetEntrances(){
+        return _allEntrances;
+    }
+
     private void UpdateSpline(int spline){
-        Debug.Log(spline);
         SplineKnotIndex firstKnot = new SplineKnotIndex(spline, 0);
-        Debug.Log(firstKnot);
+
         Junction firstJ = GetJunctionByKnot(firstKnot);
         Junction j = firstJ.GetNextOnSpline(spline); 
 
@@ -166,15 +174,33 @@ public class RoadManager : MonoBehaviour
         return closestEntrance;
     }
 
+    public void CancelBuild(){
+        _previewContainer.Splines[0].Clear();
+
+        _currentJunction = null;
+        _baseJunction = null;
+        _buildButton.SetActive(false);
+    }
 
     public void AddPreviewKnot(){
         var knot = new BezierKnot(new float3(_baseJunction.transform.position.x, _baseJunction.transform.position.y, 0f));
         knot.Position = _previewContainer.transform.InverseTransformPoint(_baseJunction.transform.position);
         _previewContainer.Splines[0].Add(knot, TangentMode.AutoSmooth);
         if(_previewContainer.Splines[0].Count == 1){
+            _buildButton.SetActive(true);
+
             _previewContainer.Splines[0].Add(knot, TangentMode.AutoSmooth);
         }
+    }
 
+    public bool CancelPreviewKnot(){
+        if(_previewContainer.Splines[0].Count > 2){
+            _previewContainer.Splines[0].RemoveAt(_previewContainer.Splines[0].Count-1);
+            return false;
+        }else{
+            RoadManager.Instance.CancelBuild();
+            return true;
+        }
     }
     
     public void AddCurrentJunction(JunctionPreview j){
@@ -206,8 +232,12 @@ public class RoadManager : MonoBehaviour
     }
 
     public void StopBuilding(){
+        _previewContainer.Splines[0].Clear();
+
         _currentJunction = null;
         _baseJunction = null;
+        _buildButton.SetActive(false);
+
         // _preview.SetActive(false);
     }
 
@@ -217,16 +247,15 @@ public class RoadManager : MonoBehaviour
 
         _previewContainer.Spline.RemoveAt(_previewContainer.Spline.Count-1);
 
-        InputManager.Instance.ClearStructure();
         // _splineInstantiate.UpdateInstances();
-        // Invoke("AddK", 1f);
         // _splineInstantiate.Clear();
         _isBuilding = true;
         BuildSpline();
         _isBuilding = false;
-        _previewContainer.Splines[0].Clear();
-        
+
         StopBuilding();
+        InputManager.Instance.ClearStructure();
+
     }
 
     private void BuildSpline(){
@@ -240,6 +269,7 @@ public class RoadManager : MonoBehaviour
             Junction junction = GetClosestJunction(pos);
             if(junction == null || Vector3.Distance(junction.transform.position, pos) >= 1f){
                 junction = Instantiate(_junctionPrefab, pos, Quaternion.identity).GetComponent<Junction>();
+                junction.SetToolTip(true);
             }
             if(prev != null){
                 junction.AddPrev(prev);
@@ -280,6 +310,9 @@ public class RoadManager : MonoBehaviour
         }
         
         knotIdx = _splineContainer.Splines[closestSpline].ConvertIndexUnit(closestT, PathIndexUnit.Knot);
+    }
+
+    public void StartBuild(){
     }
 
     public Vector3 FindClosestSplinePosition(Vector3 position){

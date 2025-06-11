@@ -10,17 +10,42 @@ public class Building : MonoBehaviour
     private List<Resource> income = new List<Resource>();
     [SerializeField]
     private List<Resource> diet = new List<Resource>();
+    
+    public Dictionary<ResourceType, float> _netResources = new Dictionary<ResourceType, float>();
+
     [SerializeField]
     private ResourceTilemapType buildOnTilemapType = ResourceTilemapType.Any;
 
+    private VeinEntrance _input, _output;
 
     private Tilemap buildOnTilemap;
     private Color defaultColor;
     private Material material;
     private HealthSystem _healthSystem;
 
+    
+
     void Awake()
     {
+        VeinEntrance[] connectedEntrances = GetComponentsInChildren<VeinEntrance>();
+        // if(connectedEntrances.Count != 0){
+        foreach(VeinEntrance ve in connectedEntrances){
+            if(ve.GetType() == EntranceType.Output){
+                _output = ve;
+            }else{
+                _input = ve;
+            }
+        }
+    
+
+        if(_input != null){
+            _input.SetBuilding(this);
+        }
+        if(_output != null){
+            _output.SetBuilding(this);
+        }
+        UpdateNetResources();
+
         _healthSystem = GetComponent<HealthSystem>();
         _healthSystem.OnDie += HealthSystem_OnDie;
         material = GetComponent<Renderer>().material;
@@ -29,6 +54,31 @@ public class Building : MonoBehaviour
         }
     }
 
+    private void UpdateNetResources(){
+        foreach(Resource r in income){
+            if(!_netResources.ContainsKey(r.resourceType)){
+                _netResources[r.resourceType] = r.initialAmount;
+            }else{
+                _netResources[r.resourceType] += r.initialAmount;
+            }
+        }
+        foreach(Resource r in diet){
+            if(!_netResources.ContainsKey(r.resourceType)){
+                _netResources[r.resourceType] = -r.initialAmount;
+            }else{
+                _netResources[r.resourceType] -= r.initialAmount;
+            }
+        }
+
+        _output.SetNetResources(_netResources);
+    }
+
+    [ContextMenu("Check resources")]
+    public void CheckResources(){
+        foreach (KeyValuePair<ResourceType, float> entry in _netResources){
+            Debug.Log(entry.Key +" "+ entry.Value);
+        }
+    }
     private void AddProduction(){
         foreach(var resource in income){
             ResourceManager.Instance.IncrementResourceProduction(resource.resourceType, resource.initialAmount);

@@ -42,7 +42,7 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    [SerializeField] private InputActionReference point, click, move;
+    [SerializeField] private InputActionReference point, click, move, _cancel, _preview;
     [SerializeField] private Grid grid;
     [SerializeField] private GameObject mainTmContainer;
     [SerializeField] private GameObject movingObject;
@@ -55,6 +55,8 @@ public class InputManager : MonoBehaviour
 
     private Vector2 _pointInput; 
     private float _clickInput; 
+    private float _previewInput; 
+    private float _cancelInput; 
     private Vector2 _moveInput;
 
     private float _clickCoolDown = 1f;
@@ -67,6 +69,14 @@ public class InputManager : MonoBehaviour
         _pointInput = point.action.ReadValue<Vector2>();
         _clickInput = click.action.ReadValue<float>();
         _moveInput = move.action.ReadValue<Vector2>();
+
+        _cancelInput = _cancel.action.ReadValue<float>();
+        _previewInput = _preview.action.ReadValue<float>();
+
+        if(_cancelInput != 0f && _clickClock >= _clickCoolDown){
+            _clickClock = 0f;
+            ClearStructure();
+        }
         if(_moveInput != Vector2.zero){
             Vector3 currentPos = movingObject.transform.position;
             currentPos.x += (_moveInput.x * camMovementFactor * Time.deltaTime);
@@ -139,6 +149,7 @@ public class InputManager : MonoBehaviour
                 building.SetPreview(true);
             }else if(attachedStructureView.TryGetComponent<Junction>(out Junction junction)){
                 // junction.isBase = true;
+                RoadManager.Instance.StartBuild();
                 RoadManager.Instance.AddJunction(junction, true);
             }
         }
@@ -146,11 +157,17 @@ public class InputManager : MonoBehaviour
     }
 
     public void ClearStructure(){
+        if(attachedStructureView == null) return;
+        bool destroy = true;
+
         if(attachedStructureView.TryGetComponent<Junction>(out Junction junction)){
-            RoadManager.Instance.StopBuilding();
+            destroy = RoadManager.Instance.CancelPreviewKnot();
         }
-        Destroy(attachedStructureView);
-        attachedStructure = null;
+        if(destroy){
+            Destroy(attachedStructureView);
+            attachedStructure = null;
+        }
+
     }
 
     private void BuildStructure(){

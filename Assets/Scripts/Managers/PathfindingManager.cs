@@ -72,14 +72,15 @@ public class PathfindingManager : MonoBehaviour
     public List<Vector2Int> GetNextMoves(int x, int y){
         return(vectorArr[x,y]);
     }
+
     void Update(){
-        _counter += Time.deltaTime;
-        if(_counter >= _maxTime){
-            _counter = 0f;
-            IntegrateCostField();
-            CalculateVectorField();            
-            recalcVectorField = false;
-        }
+        // _counter += Time.deltaTime;
+        // if(_counter >= _maxTime){
+        //     _counter = 0f;
+        //     IntegrateCostField();
+        //     CalculateVectorField();            
+        //     recalcVectorField = false;
+        // }
     }
 
     private void GenerateCostField(){

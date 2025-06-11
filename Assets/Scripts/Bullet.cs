@@ -17,7 +17,7 @@ public class Bullet : MonoBehaviour
 
     }
 
-    void FixedUpdate()
+    void Update()
     {
         // RaycastHit hit;
         // if (Physics.Raycast(transform.position, _direction, out hit, _speed * Time.deltaTime))

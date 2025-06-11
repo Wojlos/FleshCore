@@ -18,6 +18,7 @@ public class Resource
     public ResourceType resourceType;
     public int initialAmount;
     public Color color;
+    public Sprite sprite;
 
     [HideInInspector]
     public TextMeshProUGUI uiText;
@@ -38,6 +39,22 @@ public class Resource
 public class ResourceManager : MonoBehaviour
 {
     private static ResourceManager _instance;
+
+    [SerializeField]
+    private int initialBlood = 0;
+    [SerializeField]
+    private int initialScabs = 0;
+    [SerializeField]
+    private int initialLipids = 0;
+    
+    [SerializeField]
+    private GameObject resourceUIPrefab;
+    [SerializeField]
+    private List<Resource> resources = new List<Resource>();
+    [SerializeField]
+    private Transform gridLayout;
+
+    private Dictionary<ResourceType, Resource> resourceDictionary;
 
     public static ResourceManager Instance
     {
@@ -72,21 +89,6 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    [SerializeField]
-    private int initialBlood = 0;
-    [SerializeField]
-    private int initialScabs = 0;
-    [SerializeField]
-    private int initialLipids = 0;
-    
-    [SerializeField]
-    private GameObject resourceUIPrefab;
-    [SerializeField]
-    private List<Resource> resources = new List<Resource>();
-    [SerializeField]
-    private Transform gridLayout;
-
-    private Dictionary<ResourceType, Resource> resourceDictionary;
     private void Start()
     {
         InitializeResourceDictionary();
@@ -155,6 +157,15 @@ public class ResourceManager : MonoBehaviour
             return resourceDictionary[type].currentProduction;
         }
         return 0; 
+    }
+
+    public Resource GetResourceOfType(ResourceType type){
+        foreach(Resource r in resources){
+            if(r.resourceType == type){
+                return r;
+            }
+        }
+        return null;
     }
 
     public void AddResource(ResourceType type, int initialAmount, Color color)

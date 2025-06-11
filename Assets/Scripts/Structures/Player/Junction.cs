@@ -6,15 +6,36 @@ using Unity.Mathematics;
 
 public class Junction : MonoBehaviour
 {
+    [SerializeField] GameObject _tooltipPrefab;
+    private Transform _uiCanvas;
+
     private BezierKnot _knot;
     private List<SplineKnotIndex> _attachedKnots = new List<SplineKnotIndex>();
     private List<Junction> _neighbours = new List<Junction>();
+    private GameObject _toolTip;
     
     private List<Junction> _prev = new List<Junction>();
     private List<Junction> _next = new List<Junction>();
+    private VeinEntrance _veinEntrance;
 
+    private float _resource = 0f;
 
-    private int _resource = 0;
+    private Dictionary<ResourceType, float> _netResources = new Dictionary<ResourceType, float>();
+    // private bool _preview = false;
+
+    void Awake(){
+        _uiCanvas = GameObject.FindGameObjectsWithTag("UICanvas")[0].transform;
+        _toolTip = Instantiate(_tooltipPrefab, transform.position, Quaternion.identity, _uiCanvas);
+        _toolTip.SetActive(false);
+    }
+
+    void Update(){
+        _toolTip.transform.position = transform.position;
+    }
+
+    public void SetToolTip(bool b){
+        _toolTip.SetActive(b);
+    }
 
     public void AddKnot(SplineKnotIndex newKnot){
         _attachedKnots.Add(newKnot);
@@ -48,6 +69,13 @@ public class Junction : MonoBehaviour
 
     public List<SplineKnotIndex> GetKnotList(){
         return _attachedKnots;
+    }
+
+    [ContextMenu("Check resources")]
+    public void CheckResources(){
+        foreach (KeyValuePair<ResourceType, float> entry in _netResources){
+            Debug.Log(entry.Key +" "+ entry.Value);
+        }
     }
 
     public void LinkJunctions(Junction n){
@@ -97,4 +125,33 @@ public class Junction : MonoBehaviour
     public List<Junction> GetNext(){
         return _next;
     }
+
+    public float GetResource(ResourceType r){
+        return _netResources[r];
+    }
+
+    public void ClearResources(){
+        _netResources.Clear();
+    }
+
+    public void AddResource(ResourceType r, float v){
+        if(!_netResources.ContainsKey(r)){
+            _netResources[r] = 0f;
+        }
+        _netResources[r] += v;
+        _toolTip.GetComponent<ResourceToolTip>().SetResources(_netResources);
+    }
+
+    public void SetEntrance(VeinEntrance v){
+        _veinEntrance = v;
+    }
+
+    public VeinEntrance GetEntrance(){
+        return _veinEntrance;
+    }
+
+    public Dictionary<ResourceType, float> GetNetResources(){
+        return _netResources;
+    }
+
 }
