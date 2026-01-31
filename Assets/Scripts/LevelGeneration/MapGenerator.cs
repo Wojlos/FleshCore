@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class MapGenerator : MonoBehaviour
 {
+    public static MapGenerator Instance;
+
     [SerializeField]
     private GraphSettings _graphSettings;
 
@@ -11,8 +13,17 @@ public class MapGenerator : MonoBehaviour
 
     private Graph _graph;
 
-    private readonly List<BaseNode> _spawnedNodes = new List<BaseNode>();
+    private List<BaseNode> _spawnedNodes = new List<BaseNode>();
 
+    private void Awake()
+    {
+        if (Instance)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
     public void GenerateMap()
     {
         CleanMap();
@@ -31,6 +42,7 @@ public class MapGenerator : MonoBehaviour
             _spawnedNodes.Add(newNode);
         }
         ConnectNodes();
+        MapManager.Instance.InitializeMap(_spawnedNodes);
     }
 
     private void ConnectNodes()
