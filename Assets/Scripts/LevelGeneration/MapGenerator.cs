@@ -11,14 +11,13 @@ public class MapGenerator : MonoBehaviour
 
     private Graph _graph;
 
-    private readonly List<GameObject> _spawnedNodes = new List<GameObject>();
+    private readonly List<BaseNode> _spawnedNodes = new List<BaseNode>();
 
     public void GenerateMap()
     {
         CleanMap();
 
         _graph = GraphGenerator.GenerateGraph(_graphSettings);
-        Debug.Log($"Generated nodes: {_graph.allNodes.Count}");
 
         foreach (var node in _graph.allNodes)
         {
@@ -28,20 +27,48 @@ public class MapGenerator : MonoBehaviour
                 Quaternion.identity,
                 transform
             );
+            BaseNode newNode = go.GetComponent<BaseNode>();
+            _spawnedNodes.Add(newNode);
+        }
+        ConnectNodes();
+    }
 
-            _spawnedNodes.Add(go);
+    private void ConnectNodes()
+    {
+        foreach(var n in _graph.allNodes)
+        {
+            var mapNode = GetMapNodeOnPosition(n.position);
+            foreach(var connectedNode in n.connectedNodes)
+            {
+                mapNode.ConnectNode(GetMapNodeOnPosition(connectedNode.position));
+            }
         }
     }
 
+    private BaseNode GetMapNodeOnPosition(Vector2 pos)
+    {
+        foreach(var n in _spawnedNodes)
+        {
+            if(n.transform.position == new Vector3(pos.x, pos.y, 0f))
+            {
+                return n;
+            }
+        }
+        return null;
+    }
     public void CleanMap()
     {
-        for (int i = 0; i < _spawnedNodes.Count; i++)
+        for (int i = transform.childCount - 1; i >= 0; i--)
         {
-            if (_spawnedNodes[i] != null)
-                DestroyImmediate(_spawnedNodes[i]);
-        }
-        _spawnedNodes.Clear();
+            var child = transform.GetChild(i).gameObject;
 
+            if (Application.isPlaying)
+                Destroy(child);
+            else
+                DestroyImmediate(child);
+        }
+
+        _spawnedNodes.Clear();
         _graph = null;
     }
 
