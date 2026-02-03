@@ -18,10 +18,7 @@ public abstract class BaseNode : MonoBehaviour
         }
 
     }
-    public List<BaseNode> GetConnectedNodes()
-    {
-        return _connectedNodes;
-    }
+    public List<BaseNode> GetConnectedNodes() => _connectedNodes;
 
     public void AddSpline(Spline s)
     {

@@ -70,6 +70,7 @@ public class MapGenerator : MonoBehaviour
     }
     public void CleanMap()
     {
+
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             var child = transform.GetChild(i).gameObject;
@@ -84,42 +85,42 @@ public class MapGenerator : MonoBehaviour
         _graph = null;
     }
 
-    private void OnDrawGizmos()
-    {
-        if (_graph == null || _graph.allNodes == null)
-            return;
+    // private void OnDrawGizmos()
+    // {
+    //     if (_graph == null || _graph.allNodes == null)
+    //         return;
 
-        Gizmos.color = Color.yellow;
-        foreach (var node in _graph.allNodes)
-        {
-            Gizmos.DrawSphere(
-                new Vector3(node.position.x, node.position.y, 0f),
-                0.15f
-            );
-        }
+    //     Gizmos.color = Color.yellow;
+    //     foreach (var node in _graph.allNodes)
+    //     {
+    //         Gizmos.DrawSphere(
+    //             new Vector3(node.position.x, node.position.y, 0f),
+    //             0.15f
+    //         );
+    //     }
 
-        Gizmos.color = Color.white;
+    //     Gizmos.color = Color.white;
 
-        HashSet<(GraphNode, GraphNode)> drawnEdges = new HashSet<(GraphNode, GraphNode)>();
+    //     HashSet<(GraphNode, GraphNode)> drawnEdges = new HashSet<(GraphNode, GraphNode)>();
 
-        foreach (var node in _graph.allNodes)
-        {
-            foreach (var other in node.connectedNodes)
-            {
-                var edge = node.GetHashCode() < other.GetHashCode()
-                    ? (node, other)
-                    : (other, node);
+    //     foreach (var node in _graph.allNodes)
+    //     {
+    //         foreach (var other in node.connectedNodes)
+    //         {
+    //             var edge = node.GetHashCode() < other.GetHashCode()
+    //                 ? (node, other)
+    //                 : (other, node);
 
-                if (drawnEdges.Contains(edge))
-                    continue;
+    //             if (drawnEdges.Contains(edge))
+    //                 continue;
 
-                drawnEdges.Add(edge);
+    //             drawnEdges.Add(edge);
 
-                Gizmos.DrawLine(
-                    new Vector3(node.position.x, node.position.y, 0f),
-                    new Vector3(other.position.x, other.position.y, 0f)
-                );
-            }
-        }
-    }
+    //             Gizmos.DrawLine(
+    //                 new Vector3(node.position.x, node.position.y, 0f),
+    //                 new Vector3(other.position.x, other.position.y, 0f)
+    //             );
+    //         }
+    //     }
+    // }
 }

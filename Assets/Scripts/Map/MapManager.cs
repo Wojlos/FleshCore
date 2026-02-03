@@ -4,9 +4,10 @@ using System.Collections.Generic;
 
 public class MapManager : MonoBehaviour
 {
+    public static MapManager Instance;
+
     [SerializeField] private SplineContainer _splineContainer;
 
-    public static MapManager Instance;
     private SplineExtrude _splineExtrude;
     private List<BaseNode> _mapNodes = new List<BaseNode>();
 
