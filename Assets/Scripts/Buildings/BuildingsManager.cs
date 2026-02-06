@@ -6,6 +6,8 @@ public class BuildingsManager : MonoBehaviour
     public static BuildingsManager Instance;
     
     [SerializeField] private List<BaseBuilding> _allBuildings = new List<BaseBuilding>();
+    private GameSettings _settings;
+
     private void Awake()
     {
         if (Instance)
@@ -14,6 +16,7 @@ public class BuildingsManager : MonoBehaviour
             return;
         }
         Instance = this;
+        _settings = GameManager.Instance.GetGameSettings();
     }
 
     public void BuildBuilding(GameObject prefab, BaseNode node)
@@ -28,6 +31,26 @@ public class BuildingsManager : MonoBehaviour
         var building = go.GetComponent<BaseBuilding>();
         building.AssignNode(node);
         _allBuildings.Add(building);
+        
+        _settings = GameManager.Instance.GetGameSettings();
+        var buildingSettings = _settings.buildingSettings.Find(b => b.type == building.GetType());
+        building.SetUpkeep(buildingSettings.upkeep);
+        ResourceManager.Instance.ChangeBuiltBuildings(1);
+        ResourceManager.Instance.ChangeResourcesCurrent(buildingSettings.buildCost, false);
+        ResourceManager.Instance.ChangeResourcesPerSecond(buildingSettings.upkeep, false);
+
+    }
+
+    public void RemoveBuilding(BaseNode node)
+    {
+        ResourceManager.Instance.ChangeBuiltBuildings(-1);
+
+        var building = node.GetBuilding();
+        var buildingSettings = _settings.buildingSettings.Find(b => b.type == building.GetType());
+
+        ResourceManager.Instance.ChangeResourcesPerSecond(buildingSettings.upkeep, true);
+        _allBuildings.Remove(node.GetBuilding());
+        node.RemoveBuilding();
     }
 
     public void ClearAllBuildings()
@@ -41,7 +64,6 @@ public class BuildingsManager : MonoBehaviour
                 continue;
             }
 
-            // building.Cleanup();
             Destroy(building.gameObject);
 
             _allBuildings.RemoveAt(i);
@@ -49,6 +71,5 @@ public class BuildingsManager : MonoBehaviour
 
         _allBuildings.Clear();
     }
-
 
 }

@@ -9,8 +9,7 @@ public enum GraphType
 public class GraphSettings
 {
     [Min(2)] public int numberOfVertices = 2;
-    [Min(1)] public int minVertDegree = 1;
-    [Min(1)] public int maxVertDegree = 4;
+    [Min(1)] public int scaleFactor = 4;
 
     public GraphType type;
 

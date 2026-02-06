@@ -3,8 +3,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-
     private BaseNode _selectedNode;
+    [SerializeField] private GameSettings _gameSettings;
 
 
     private void Awake()
@@ -19,8 +19,8 @@ public class GameManager : MonoBehaviour
     }
 
     public void ClickedOnNode(BaseNode node){
-        BuildingSelectionManager.Instance.OpenBuildingSelection();
         SelectNode(node);
+        BuildingSelectionManager.Instance.OpenBuildingSelection();
     }
     public void ClickedAnywhere()
     {
@@ -32,6 +32,11 @@ public class GameManager : MonoBehaviour
         BuildingsManager.Instance.BuildBuilding(prefab, _selectedNode);
         DeselectNode();
     }   
+    public void RemoveBuilding()
+    {
+        BuildingsManager.Instance.RemoveBuilding(_selectedNode);
+        DeselectNode();
+    }
 
     public void Cleanup()
     {
@@ -48,5 +53,10 @@ public class GameManager : MonoBehaviour
         BuildingSelectionManager.Instance.CloseBuildingSelection();   
     }
 
+    public GameSettings GetGameSettings() => _gameSettings;
+    public bool IsNodeEmpty()
+    {
+        return _selectedNode != null && _selectedNode.GetBuilding() == null;
+    }
 
 }

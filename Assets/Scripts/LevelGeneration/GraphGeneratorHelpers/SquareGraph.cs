@@ -5,12 +5,12 @@ public static class SquareGraphBuilder
 {
     public static Graph BuildGraph(GraphSettings settings)
     {
-        var grid = CreateGrid(settings.numberOfVertices);
-        var graph = ConnectNodes(grid);
+        var grid = CreateGrid(settings);
+        var graph = ConnectNodes(grid,settings.scaleFactor);
         
         return graph;
     }
-    private static Graph ConnectNodes(GraphNode[,] grid)
+    private static Graph ConnectNodes(GraphNode[,] grid, int scale)
     {
         var graph = new Graph();
         var verts = grid.GetLength(0);
@@ -19,7 +19,7 @@ public static class SquareGraphBuilder
             for (int j = 0; j < verts-1; j++)
             {
                 var node = grid[i, j];
-                node.position = new Vector2(i,j);
+                node.position = new Vector2(i*scale,j*scale);
                 graph.AddNode(node);
                 if(i != 0)
                 {
@@ -38,8 +38,10 @@ public static class SquareGraphBuilder
 
         return graph;
     }
-    private static GraphNode[,] CreateGrid(int verts)
+    private static GraphNode[,] CreateGrid(GraphSettings settings)
     {
+        int verts = settings.numberOfVertices;
+        
         GraphNode[,] grid = new GraphNode[verts, verts];
 
         for (int i = 0; i < verts; i++)

@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a12471cd06d2624c9c6aabe8a711f2d, type: 3}
+  m_Name: GameSettings1
+  m_EditorClassIdentifier: Assembly-CSharp::GameSettings
+  startingMaxBuildings: 3
+  startingResources:
+  - type: 0
+    cost: 4
+  - type: 1
+    cost: 4
+  - type: 2
+    cost: 4
+  pumpMaxBuildingIncrease: 2
+  buildingSettings:
+  - type: 0
+    sprite: {fileID: 1569033066621811975, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
+    buildCost:
+    - type: 0
+      cost: 2
+    upkeep:
+    - type: 0
+      cost: 1
+  - type: 1
+    sprite: {fileID: -1231628468, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
+    buildCost:
+    - type: 2
+      cost: 1
+    upkeep: []
+  - type: 2
+    sprite: {fileID: 57806773, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
+    buildCost:
+    - type: 0
+      cost: 1
+    - type: 1
+      cost: 2
+    - type: 2
+      cost: 1
+    upkeep:
+    - type: 0
+      cost: 1
+    - type: 1
+      cost: 2
+    - type: 2
+      cost: 1
