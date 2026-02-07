@@ -80,7 +80,7 @@ public class ResourceManager : MonoBehaviour
         {
             res[r.type] = r.cost;
         }
-        ChangeResourcesCurrent(res);
+        TryChangeResourcesCurrent(res);
 
     }
     
@@ -123,24 +123,49 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    public void ChangeResourcesCurrent(Dictionary<ResourceType, int> change, bool add = true)
+    public bool TryChangeResourcesCurrent(Dictionary<ResourceType, int> change, bool add = true)
     {
         int factor = add ? 1 : -1;
 
         foreach (var kvp in change)
         {
+            int current = _resourcePanels[kvp.Key].GetCurrent();
+            int newValue = current + kvp.Value * factor;
+
+            if (newValue < 0)
+                return false;
+        }
+
+        // 2. Apply if all valid
+        foreach (var kvp in change)
+        {
             _resourcePanels[kvp.Key].ChangeCurrent(kvp.Value * factor);
         }
+
+        return true;
     }
 
-    public void ChangeResourcesCurrent(List<ResourceCost> change, bool add = true)
+    public bool TryChangeResourcesCurrent(List<ResourceCost> change, bool add = true)
     {
         int factor = add ? 1 : -1;
 
+        // 1. Validate first
+        foreach (var cost in change)
+        {
+            int current = _resourcePanels[cost.type].GetCurrent();
+            int newValue = current + cost.cost * factor;
+
+            if (newValue < 0)
+                return false;
+        }
+
+        // 2. Apply if all valid
         foreach (var cost in change)
         {
             _resourcePanels[cost.type].ChangeCurrent(cost.cost * factor);
         }
+
+        return true;
     }
 
     public bool IsMaxBuildingsReached()

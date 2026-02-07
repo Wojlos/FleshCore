@@ -36,7 +36,7 @@ public class BuildingsManager : MonoBehaviour
         var buildingSettings = _settings.buildingSettings.Find(b => b.type == building.GetType());
         building.SetUpkeep(buildingSettings.upkeep);
         ResourceManager.Instance.ChangeBuiltBuildings(1);
-        ResourceManager.Instance.ChangeResourcesCurrent(buildingSettings.buildCost, false);
+        ResourceManager.Instance.TryChangeResourcesCurrent(buildingSettings.buildCost, false);
         ResourceManager.Instance.ChangeResourcesPerSecond(buildingSettings.upkeep, false);
 
     }

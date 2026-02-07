@@ -105,6 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98d826285af5b6c40a5428997efe555b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Harvester
+  _disabledMarker: {fileID: 7998641341174592362}
 --- !u!1 &7998641341174592362
 GameObject:
   m_ObjectHideFlags: 0

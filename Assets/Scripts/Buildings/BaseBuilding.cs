@@ -3,11 +3,12 @@ using System.Collections.Generic;
 
 public abstract class BaseBuilding : MonoBehaviour
 {
+    [SerializeField] private GameObject _disabledMarker;
     private BuildingType _type;
     private BaseNode _node;
     private List<ResourceCost> _upkeep = new List<ResourceCost>();
     private float _upkeepTimer = 0;
-
+    protected bool _active = false;
 
     protected BaseBuilding(BuildingType type)
     {
@@ -31,17 +32,38 @@ public abstract class BaseBuilding : MonoBehaviour
 
     void Update()
     {
+        OnUpdate();
+    }
+
+    protected virtual void OnUpdate()
+    {
         _upkeepTimer += Time.deltaTime;
 
         if (_upkeepTimer >= 1f)
         {
             _upkeepTimer = 0f;
-            ResourceManager.Instance.ChangeResourcesCurrent(_upkeep, false);
-        }
+            if(!ResourceManager.Instance.TryChangeResourcesCurrent(_upkeep, false))
+            {
+                Disable();
+            }
+            else
+            {
+                Enable();
+            }
+        }      
+    }
+    public BuildingType GetType()=> _type;
 
+    protected virtual void Disable()
+    {
+        _active = false;
+        _disabledMarker.SetActive(true);
         
     }
-
-    public BuildingType GetType()=> _type;
+    protected virtual void Enable()
+    {
+        _active = true;
+        _disabledMarker.SetActive(false);
+    }
 
 }

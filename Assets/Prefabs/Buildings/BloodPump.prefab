@@ -196,3 +196,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0557da66279859347954ca397398c61b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BloodPump
+  _disabledMarker: {fileID: 149733193552426405}

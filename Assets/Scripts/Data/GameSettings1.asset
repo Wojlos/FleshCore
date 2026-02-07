@@ -35,7 +35,9 @@ MonoBehaviour:
     buildCost:
     - type: 2
       cost: 1
-    upkeep: []
+    upkeep:
+    - type: 2
+      cost: 3
   - type: 2
     sprite: {fileID: 57806773, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
     buildCost:

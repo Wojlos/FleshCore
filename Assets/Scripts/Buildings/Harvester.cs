@@ -23,16 +23,35 @@ public class Harvester : BaseBuilding
 
     }
 
-    void Update()
+    protected override void OnUpdate()
     {
 
+        base.OnUpdate();
+        if (!_active) return;
         _productionTimer += Time.deltaTime;
 
         if (_productionTimer >= 1f)
         {
             _productionTimer = 0f;
-            ResourceManager.Instance.ChangeResourcesCurrent(_resourceProduction, true);
+            ResourceManager.Instance.TryChangeResourcesCurrent(_resourceProduction, true);
         }
     }
+
+    protected override void Disable()
+    {
+        if(!_active) return;
+
+        base.Disable();
+        ResourceManager.Instance.ChangeResourcesPerSecond(_resourceProduction, false);
+    }
+
+    protected override void Enable()
+    {
+        if(_active) return;
+
+        base.Enable();
+        ResourceManager.Instance.ChangeResourcesPerSecond(_resourceProduction, true);
+    }
+    
 
 }
