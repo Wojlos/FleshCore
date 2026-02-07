@@ -35,10 +35,12 @@ public class BuildingsManager : MonoBehaviour
         _settings = GameManager.Instance.GetGameSettings();
         var buildingSettings = _settings.buildingSettings.Find(b => b.type == building.GetType());
         building.SetUpkeep(buildingSettings.upkeep);
+        building.SetUnitProduction(buildingSettings.unitProductionPerSecond);
+        
         ResourceManager.Instance.ChangeBuiltBuildings(1);
         ResourceManager.Instance.TryChangeResourcesCurrent(buildingSettings.buildCost, false);
         ResourceManager.Instance.ChangeResourcesPerSecond(buildingSettings.upkeep, false);
-
+        ResourceManager.Instance.ChangeMaxUnits(buildingSettings.maxUnitsIncrease);
     }
 
     public void RemoveBuilding(BaseNode node)

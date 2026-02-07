@@ -26,7 +26,9 @@ public class ResourceManager : MonoBehaviour
 
     
     [Header("counters")]
-    [SerializeField] private TextMeshProUGUI buildingText;
+    [SerializeField] private TextMeshProUGUI _buildingText;
+    [SerializeField] private TextMeshProUGUI _unitText;
+
 
     [Header("resources")]
     [SerializeField] private List<ResourceData> _resourceData = new List<ResourceData>();
@@ -34,6 +36,9 @@ public class ResourceManager : MonoBehaviour
 
     private int _maxBuildings = 0;
     private int _builtBuildings = 0;
+    
+    private int _maxUnits = 0;
+    private int _currentUnits = 0;
     private GameSettings _settings;
     private Dictionary<ResourceType, ResourcePanel> _resourcePanels =  new Dictionary<ResourceType, ResourcePanel>();
 
@@ -52,6 +57,7 @@ public class ResourceManager : MonoBehaviour
     {
         _settings = GameManager.Instance.GetGameSettings();
         _maxBuildings = _settings.startingMaxBuildings;
+        _maxUnits = _settings.startingMaxUnits;
         UpdateCounters();
         PopulateResourceCounters();
         SetupStartingResources();
@@ -95,13 +101,26 @@ public class ResourceManager : MonoBehaviour
         _builtBuildings += a;
         UpdateCounters();
     }
+    public void ChangeMaxUnits(int a)
+    {
+        _maxUnits += a;
+        UpdateCounters();
+    
+    }
+    public void ChangeCurrentUnits(int a)
+    {
+        _currentUnits += a;
+        UpdateCounters();
+    }
 
     private void UpdateCounters()
     {
-        buildingText.text = ""+_builtBuildings+"/"+_maxBuildings;
+        _buildingText.text = ""+_builtBuildings+"/"+_maxBuildings;
+        _unitText.text = ""+_currentUnits+"/"+_maxUnits;
     }
 
     public int GetMaxBuildings()=> _maxBuildings;
+    public int GetMaxUnits()=> _maxBuildings;
 
     public void ChangeResourcesPerSecond(Dictionary<ResourceType, int> change, bool add = true)
     {
@@ -136,7 +155,6 @@ public class ResourceManager : MonoBehaviour
                 return false;
         }
 
-        // 2. Apply if all valid
         foreach (var kvp in change)
         {
             _resourcePanels[kvp.Key].ChangeCurrent(kvp.Value * factor);
@@ -149,7 +167,6 @@ public class ResourceManager : MonoBehaviour
     {
         int factor = add ? 1 : -1;
 
-        // 1. Validate first
         foreach (var cost in change)
         {
             int current = _resourcePanels[cost.type].GetCurrent();
@@ -159,7 +176,6 @@ public class ResourceManager : MonoBehaviour
                 return false;
         }
 
-        // 2. Apply if all valid
         foreach (var cost in change)
         {
             _resourcePanels[cost.type].ChangeCurrent(cost.cost * factor);
@@ -168,9 +184,29 @@ public class ResourceManager : MonoBehaviour
         return true;
     }
 
+    public bool TryChangeUnits(int change)
+    {
+        int tempCount = _currentUnits + change;
+        if(tempCount < 0 || tempCount > _maxUnits)
+        {
+            return false;
+        }
+        else
+        {
+            _currentUnits = tempCount;
+            UpdateCounters();
+            return true;
+        }
+    }
+
+
     public bool IsMaxBuildingsReached()
     {
         return _builtBuildings >= _maxBuildings;
+    }
+    public bool IsMaxUnitsReached()
+    {
+        return _currentUnits >= _maxUnits;
     }
     public Dictionary<ResourceType, int> GetCurrentResources()
     {

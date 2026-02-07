@@ -10,6 +10,7 @@ public class BloodPump : BaseBuilding
     private void Awake() {
         var settings = GameManager.Instance.GetGameSettings();
         maxBuildingIncrease = settings.pumpMaxBuildingIncrease;
+        ResourceManager.Instance.ChangeMaxBuildings(maxBuildingIncrease);
     }
 
     public override void Cleanup()
@@ -19,7 +20,7 @@ public class BloodPump : BaseBuilding
 
     }
 
-     protected override void Disable()
+    protected override void Disable()
     {
         if(!_active) return;
         base.Disable();

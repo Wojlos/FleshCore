@@ -519,7 +519,7 @@
             ]
         },
         {
-            "name": "MapPointer",
+            "name": "Player",
             "id": "7b70d7e5-2fb9-4c8c-a829-ffce7632a5e0",
             "actions": [
                 {
@@ -535,6 +535,15 @@
                     "name": "Point",
                     "type": "Value",
                     "id": "4e6c9b7c-fccf-4bad-a258-668d7f00e37e",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "b206cb28-e024-4785-b15c-f187e05cf74e",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
@@ -563,6 +572,61 @@
                     "action": "Point",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "2D Vector",
+                    "id": "bb8cc8ca-753a-4935-aa0b-319a24475030",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "06664d44-1390-4074-87ee-b58e02750e64",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "6927fb22-ca79-419e-9860-721066676e81",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "339350b2-f51d-4fc9-91bd-bf72e70ddca6",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "6c774b45-3ccd-4788-b531-8cd712d4a882",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }

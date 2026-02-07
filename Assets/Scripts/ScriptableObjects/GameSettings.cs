@@ -15,7 +15,8 @@ public class BuildingSettings
     public Sprite sprite;
     public List<ResourceCost> buildCost = new List<ResourceCost>();
     public List<ResourceCost> upkeep = new List<ResourceCost>();
-
+    public int maxUnitsIncrease = 1;
+    public int unitProductionPerSecond = 0;
 }
 
 [CreateAssetMenu(fileName = "GameSettings", menuName = "Scriptable Objects/GameSettings")]
@@ -23,10 +24,15 @@ public class GameSettings : ScriptableObject
 {
     [Header("start conditions")]
     public int startingMaxBuildings =  1;
+    public int startingMaxUnits =  1;
+
     public List<ResourceCost> startingResources = new List<ResourceCost>();
 
     [Header("building settings")]
     public int pumpMaxBuildingIncrease = 1;
+
     public List<BuildingSettings> buildingSettings = new List<BuildingSettings>();
+
+
 
 }

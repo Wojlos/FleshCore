@@ -471,6 +471,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4319bd34c5ff8b546a2cd3889027dd91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NeutralNode
+  _playerUnitCounter: {fileID: 3461566491328319956}
+  _enemyUnitsCounter: {fileID: 4365315352378832767}
 --- !u!58 &1212836272707715036
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -530,9 +530,25 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 4e6c9b7c-fccf-4bad-a258-668d7f00e37e
     m_ActionName: 'MapPointer/Point[/Mouse/position]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 519420033}
+        m_TargetAssemblyTypeName: CameraController, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b206cb28-e024-4785-b15c-f187e05cf74e
+    m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
-  m_DefaultActionMap: MapPointer
+  m_DefaultActionMap: 
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 519420031}
 --- !u!4 &333144108
@@ -740,6 +756,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -865,6 +882,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c12435bfde6f3124fbde005e951ceb9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraController
+  moveSpeed: 10
 --- !u!1 &566371429
 GameObject:
   m_ObjectHideFlags: 0
@@ -2465,7 +2495,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ResourceManager
   _resourceBar: {fileID: 1345392266}
   _resourcePanelPrefab: {fileID: 2109880663883423217, guid: 80b477505d9019d4f8461890336051e0, type: 3}
-  buildingText: {fileID: 1866865522}
+  _buildingText: {fileID: 1866865522}
+  _unitText: {fileID: 1686138093}
   _resourceData:
   - type: 0
     icon: {fileID: -5110015343868102693, guid: 63c222a7e0c6ddb47bccf99608de9e9c, type: 3}

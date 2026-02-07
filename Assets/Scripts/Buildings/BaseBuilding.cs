@@ -5,10 +5,12 @@ public abstract class BaseBuilding : MonoBehaviour
 {
     [SerializeField] private GameObject _disabledMarker;
     private BuildingType _type;
-    private BaseNode _node;
+    protected BaseNode _node;
     private List<ResourceCost> _upkeep = new List<ResourceCost>();
     private float _upkeepTimer = 0;
-    protected bool _active = false;
+    protected int _unitProductionPerSecond = 0;
+
+    protected bool _active = true;
 
     protected BaseBuilding(BuildingType type)
     {
@@ -53,7 +55,11 @@ public abstract class BaseBuilding : MonoBehaviour
         }      
     }
     public BuildingType GetType()=> _type;
-
+    public void SetUnitProduction(int u)
+    {
+        _unitProductionPerSecond = u;
+        
+    }
     protected virtual void Disable()
     {
         _active = false;
