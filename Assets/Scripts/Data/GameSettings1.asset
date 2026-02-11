@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a12471cd06d2624c9c6aabe8a711f2d, type: 3}
   m_Name: GameSettings1
   m_EditorClassIdentifier: Assembly-CSharp::GameSettings
-  startingMaxBuildings: 3
+  startingMaxBuildings: 1
   startingMaxUnits: 0
   startingResources:
   - type: 0
@@ -47,17 +47,17 @@ MonoBehaviour:
     sprite: {fileID: 57806773, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
     buildCost:
     - type: 0
-      cost: 1
+      cost: 0
     - type: 1
-      cost: 2
+      cost: 0
     - type: 2
-      cost: 1
+      cost: 0
     upkeep:
     - type: 0
-      cost: 1
+      cost: 0
     - type: 1
-      cost: 2
+      cost: 0
     - type: 2
-      cost: 1
+      cost: 0
     maxUnitsIncrease: 15
     unitProductionPerSecond: 3

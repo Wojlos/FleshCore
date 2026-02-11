@@ -1,11 +1,12 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     private BaseNode _selectedNode;
     [SerializeField] private GameSettings _gameSettings;
-
+    private List<UnitCounter> _selectedCounters = new List<UnitCounter>();
 
     private void Awake()
     {
@@ -19,12 +20,52 @@ public class GameManager : MonoBehaviour
     }
 
     public void ClickedOnNode(BaseNode node){
+        DeselectCounters();
         SelectNode(node);
         BuildingSelectionManager.Instance.OpenBuildingSelection();
+    }
+    public void RightClickedOnNode(BaseNode node){
+        var movedUnits =0;
+        foreach(var c in _selectedCounters)
+        {
+            var n = c.GetConnectedNode();
+            movedUnits += n.GetAllPlayerUnits();
+        }        
+        node.ChangeUnitCount(movedUnits, true);
+        DeselectCounters();
+
+    }
+    public void ClickedOnUnitCounter(UnitCounter counter){
+        DeselectCounters();
+        counter.SelectUnits();
+        _selectedCounters.Add(counter);
+    }
+
+    public void SelectUnitsInArea(Rect area)
+    {
+        DeselectCounters();
+
+        var nodes = MapManager.Instance.GetAllNodesInArea(area);
+
+        foreach(var n in nodes)
+        {
+            var counter = n.GetUnitCounter(); 
+            _selectedCounters.Add(counter);
+            counter.SelectUnits();
+        }
+    }
+    private void DeselectCounters()
+    {
+        foreach(var c in _selectedCounters)
+        {
+            c.DeselectUnits();
+        }
+        _selectedCounters.Clear();
     }
     public void ClickedAnywhere()
     {
         DeselectNode();
+        DeselectCounters();
     }
 
     public void BuildBuilding(GameObject prefab)

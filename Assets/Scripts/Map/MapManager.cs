@@ -50,5 +50,28 @@ public class MapManager : MonoBehaviour
         n1.AddSpline(newSpline);
         n2.AddSpline(newSpline);
     }
+    
+    public List<BaseNode> GetAllNodesInArea(Rect area)
+    {
+        var result = new List<BaseNode>();
+        if (_mapNodes == null || _mapNodes.Count == 0) return result;
+
+        Camera cam = Camera.main;
+        if (cam == null) return result;
+
+        foreach (var node in _mapNodes)
+        {
+            if (node == null) continue;
+
+            Vector3 screenPos = cam.WorldToScreenPoint(node.transform.position);
+
+            if (screenPos.z < 0f) continue;
+
+            if (area.Contains(new Vector2(screenPos.x, screenPos.y)))
+                result.Add(node);
+        }
+
+        return result;
+    }
 
 }
