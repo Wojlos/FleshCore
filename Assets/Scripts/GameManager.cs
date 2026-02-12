@@ -29,9 +29,10 @@ public class GameManager : MonoBehaviour
         foreach(var c in _selectedCounters)
         {
             var n = c.GetConnectedNode();
-            movedUnits += n.GetAllPlayerUnits();
+            var unitsMoved = n.GetAllPlayerUnits();
+            n.SendUnits(unitsMoved, node);
         }        
-        node.ChangeUnitCount(movedUnits, true);
+        // node.ChangeUnitCount(movedUnits, true);
         DeselectCounters();
 
     }

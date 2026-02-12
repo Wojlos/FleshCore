@@ -6,6 +6,8 @@ public abstract class BaseNode : MonoBehaviour
 {
     [SerializeField] private UnitCounter _playerUnitCounter;
     [SerializeField] private UnitCounter _enemyUnitCounter;
+    [SerializeField] private GameObject _unitTravelGroupPrefab;
+
 
     private List<BaseNode> _connectedNodes = new List<BaseNode>();
     private List<Spline> _splines = new List<Spline>();
@@ -31,6 +33,17 @@ public abstract class BaseNode : MonoBehaviour
         HideCounters();
         return tempUnits;
 
+    }
+    public List<Spline> GetSplines()=> _splines;
+    public void SendUnits(int units, BaseNode destination)
+    {
+         GameObject go = Instantiate(
+                _unitTravelGroupPrefab,
+                destination.transform.position,
+                Quaternion.identity
+            );
+        var utr = go.GetComponent<UnitTravelGroup>();
+        utr.SetupTravel(units, this, destination);
     }
     public void ChangeUnitCount(int change, bool player)
     {

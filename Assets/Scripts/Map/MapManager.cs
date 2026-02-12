@@ -51,6 +51,7 @@ public class MapManager : MonoBehaviour
         n2.AddSpline(newSpline);
     }
     
+    public List<BaseNode> GetAllNodes() => _mapNodes;
     public List<BaseNode> GetAllNodesInArea(Rect area)
     {
         var result = new List<BaseNode>();
