@@ -33,6 +33,9 @@ public class GameSettings : ScriptableObject
 
     public List<BuildingSettings> buildingSettings = new List<BuildingSettings>();
 
+    [Header("Enemy settings")]
+
+    public int maxImmunoBuildings = 1;
 
 
 }

@@ -25,39 +25,19 @@ MonoBehaviour:
   buildingSettings:
   - type: 0
     sprite: {fileID: 1569033066621811975, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
-    buildCost:
-    - type: 0
-      cost: 2
-    upkeep:
-    - type: 0
-      cost: 1
+    buildCost: []
+    upkeep: []
     maxUnitsIncrease: 5
     unitProductionPerSecond: 0
   - type: 1
     sprite: {fileID: -1231628468, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
-    buildCost:
-    - type: 2
-      cost: 1
-    upkeep:
-    - type: 2
-      cost: 0
+    buildCost: []
+    upkeep: []
     maxUnitsIncrease: 5
     unitProductionPerSecond: 0
   - type: 2
     sprite: {fileID: 57806773, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
-    buildCost:
-    - type: 0
-      cost: 0
-    - type: 1
-      cost: 0
-    - type: 2
-      cost: 0
-    upkeep:
-    - type: 0
-      cost: 0
-    - type: 1
-      cost: 0
-    - type: 2
-      cost: 0
+    buildCost: []
+    upkeep: []
     maxUnitsIncrease: 15
     unitProductionPerSecond: 3

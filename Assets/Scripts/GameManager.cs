@@ -50,9 +50,12 @@ public class GameManager : MonoBehaviour
 
         foreach(var n in nodes)
         {
-            var counter = n.GetUnitCounter(); 
-            _selectedCounters.Add(counter);
-            counter.SelectUnits();
+            var counter = n.GetUnitCounter();
+            if (counter){
+                _selectedCounters.Add(counter);
+                counter.SelectUnits();    
+            }
+            
         }
     }
     private void DeselectCounters()

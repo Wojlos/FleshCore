@@ -10,11 +10,12 @@ public abstract class BaseNode : MonoBehaviour
 
 
     private List<BaseNode> _connectedNodes = new List<BaseNode>();
-    private List<Spline> _splines = new List<Spline>();
+    private List<SplineContainer> _splineContainers = new List<SplineContainer>();
     private BaseBuilding _building;
 
     private int _playerUnits = 0;
     private int _enemyUnits = 0;
+    private List<UnitTravelGroup> _attachedPlayerTravelGroups = new List<UnitTravelGroup>();
 
 
     private void Awake() {
@@ -24,26 +25,49 @@ public abstract class BaseNode : MonoBehaviour
         UpdateCounters();
         HideCounters();
     }
-    public UnitCounter GetUnitCounter() => _playerUnitCounter;
+    
+    public List<UnitTravelGroup> GetTravelGroups() => _attachedPlayerTravelGroups;
+    public void AddPlayerTravelGroup(UnitTravelGroup tg)
+    {
+        _attachedPlayerTravelGroups.Add(tg);
+    }
+    public void RemovePlayerTravelGroup(UnitTravelGroup tg)
+    {
+        _attachedPlayerTravelGroups.Remove(tg);
+    }
+    
+    public UnitCounter GetUnitCounter(){
+        if(_playerUnits != 0)
+        {
+            return _playerUnitCounter;
+        }
+        return null;
+    }
     public int GetAllPlayerUnits()
     {
-        var tempUnits = _playerUnits;
-        _playerUnits = 0;
-        UpdateCounters();
-        HideCounters();
-        return tempUnits;
+        return _playerUnits;
 
     }
-    public List<Spline> GetSplines()=> _splines;
+    public List<SplineContainer> GetSplineContainers()=> _splineContainers;
     public void SendUnits(int units, BaseNode destination)
     {
-         GameObject go = Instantiate(
-                _unitTravelGroupPrefab,
-                destination.transform.position,
-                Quaternion.identity
-            );
+        CancelPlayerTravelGroups();
+        GameObject go = Instantiate(
+            _unitTravelGroupPrefab,
+            destination.transform.position,
+            Quaternion.identity
+        );
         var utr = go.GetComponent<UnitTravelGroup>();
         utr.SetupTravel(units, this, destination);
+    }
+
+    private void CancelPlayerTravelGroups()
+    {
+        foreach( var tg in _attachedPlayerTravelGroups)
+        {
+            tg.CancelTravel();
+        }
+        _attachedPlayerTravelGroups.Clear();
     }
     public void ChangeUnitCount(int change, bool player)
     {
@@ -98,9 +122,9 @@ public abstract class BaseNode : MonoBehaviour
     }
     public List<BaseNode> GetConnectedNodes() => _connectedNodes;
 
-    public void AddSpline(Spline s)
+    public void AddSplineContainer(SplineContainer s)
     {
-        _splines.Add(s);
+        _splineContainers.Add(s);
     }
 
     public void AssignBuilding(BaseBuilding building)
