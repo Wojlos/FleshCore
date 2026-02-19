@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class Harvester : BaseBuilding
+public class Harvester : PlayerBuilding
 {
     public Harvester() : base(BuildingType.Harvester)
     {
@@ -37,7 +37,7 @@ public class Harvester : BaseBuilding
         }
     }
 
-    protected override void Disable()
+    public override void Disable()
     {
         if(!_active) return;
 
@@ -45,7 +45,7 @@ public class Harvester : BaseBuilding
         ResourceManager.Instance.ChangeResourcesPerSecond(_resourceProduction, false);
     }
 
-    protected override void Enable()
+    public override void Enable()
     {
         if(_active) return;
 

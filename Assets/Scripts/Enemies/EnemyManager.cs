@@ -24,6 +24,10 @@ public class EnemyManager : MonoBehaviour
             return;
         }
         Instance = this;
+        
+        var settings = GameManager.Instance.GetGameSettings();
+        _maxStructures = settings.maxImmunoBuildings;
+        _maxUnits = settings.maxImmunoUnits;
     }
 
     void Update()
@@ -47,6 +51,10 @@ public class EnemyManager : MonoBehaviour
         var structure = go.GetComponent<BaseStructure>();
         _enemyStructures.Add(structure);
         structure.AssignNode(node);
+
+        var settings = GameManager.Instance.GetGameSettings();
+        var structureSettings = settings.immunoBuildingSettings.Find(s => s.type == structure.GetStructureType());
+        structure.ApplySettings(structureSettings);
     }
 
     private BaseNode SelectRandomNode()

@@ -1,18 +1,18 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public abstract class BaseStructure : MonoBehaviour
+public abstract class BaseStructure : EnemyBuilding
 {
-    protected StructureType _type;
-    protected BaseNode _node;
+    protected StructureType _structureType;
     private float _internalTimer = 0;
-    protected int _unitProductionPerSecond = 1;
 
-    protected bool _active = true;
-
-    private void SetType(StructureType type)
+    protected BaseStructure(BuildingType type) : base(type)
     {
-        _type = type;
+    }
+
+    public void SetStructureType(StructureType type)
+    {
+        _structureType = type;
     }
 
     public void AssignNode(BaseNode node)
@@ -21,44 +21,21 @@ public abstract class BaseStructure : MonoBehaviour
         _node.AssignStructure(this);
     }
 
-    public virtual void Cleanup()
+    protected override void OnUpdate()
     {
+        base.OnUpdate();
         
-    }
-
-    void Update()
-    {
-        OnUpdate();
-    }
-
-    protected virtual void OnUpdate()
-    {
-        // if (!_active) return;
+        if (!_active) return;
 
         _internalTimer += Time.deltaTime;
         if (_internalTimer >= 1f)
         {
             _internalTimer = 0f;
-            if (EnemyManager.Instance.TryChangeUnits(_unitProductionPerSecond))
-            {
-            _node.ChangeUnitCount(_unitProductionPerSecond, false);
-            }
+            _node.CreateUnits(_unitProductionPerSecond, false);
         }
           
     }
-    public StructureType GetType()=> _type;
-    public void SetUnitProduction(int u)
-    {
-        _unitProductionPerSecond = u;
-        
-    }
-    protected virtual void Disable()
-    {
-        _active = false;
-    }
-    protected virtual void Enable()
-    {
-        _active = true;
-    }
+    
+    public StructureType GetStructureType()=> _structureType;
 
 }

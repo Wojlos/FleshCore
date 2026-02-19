@@ -18,6 +18,11 @@ public abstract class BaseNode : MonoBehaviour
     private int _enemyUnits = 0;
     private List<UnitTravelGroup> _attachedPlayerTravelGroups = new List<UnitTravelGroup>();
 
+    private bool _inBattle = false;
+    private float _battleTimer = 0f;
+    private const float _battleTickInterval = 1f;
+    private const float _damageChance = 0.3f;
+
 
     private void Awake() {
         _playerUnitCounter.ConnectNode(this);
@@ -25,6 +30,106 @@ public abstract class BaseNode : MonoBehaviour
 
         UpdateCounters();
         HideCounters();
+    }
+
+    private void Update()
+    {
+        CheckAndRunBattle();
+    }
+
+    private void CheckAndRunBattle()
+    {
+        if (_playerUnits > 0 && _enemyUnits > 0)
+        {
+            if (!_inBattle)
+            {
+                _inBattle = true;
+                _battleTimer = 0f;
+            }
+
+            _battleTimer += Time.deltaTime;
+            if (_battleTimer >= _battleTickInterval)
+            {
+                _battleTimer = 0f;
+                ProcessBattleTick();
+            }
+        }
+        else
+        {
+            if (_inBattle)
+            {
+                FinishBattle();
+            }
+            _inBattle = false;
+            _battleTimer = 0f;
+        }
+    }
+
+    private void FinishBattle()
+    {
+        ConflictSide winner;
+        
+        if (_playerUnits > 0 && _enemyUnits == 0)
+        {
+            winner = ConflictSide.Player;
+        }
+        else if (_enemyUnits > 0 && _playerUnits == 0)
+        {
+            winner = ConflictSide.Immuno;
+        }
+        else
+        {
+            return;
+        }
+
+        if (winner == ConflictSide.Immuno)
+        {
+            if (_building != null)
+            {
+                _building.Disable();
+            }
+        }
+        else if (winner == ConflictSide.Player)
+        {
+            if (_structure != null)
+            {
+                _structure.Disable();
+            }
+        }
+    }
+
+    private void ProcessBattleTick()
+    {
+        int playerKills = 0;
+        int enemyKills = 0;
+
+        for (int i = 0; i < _playerUnits; i++)
+        {
+            if (Random.value <= _damageChance)
+            {
+                playerKills++;
+            }
+        }
+
+        for (int i = 0; i < _enemyUnits; i++)
+        {
+            if (Random.value <= _damageChance)
+            {
+                enemyKills++;
+            }
+        }
+
+        playerKills = Mathf.Min(playerKills, _enemyUnits);
+        enemyKills = Mathf.Min(enemyKills, _playerUnits);
+
+        if (playerKills > 0)
+        {
+            DestroyUnits(playerKills, false);
+        }
+        if (enemyKills > 0)
+        {
+            DestroyUnits(enemyKills, true);
+        }
     }
     
     public List<UnitTravelGroup> GetTravelGroups() => _attachedPlayerTravelGroups;
@@ -73,15 +178,38 @@ public abstract class BaseNode : MonoBehaviour
     public void ChangeUnitCount(int change, bool player)
     {
         if (player)
-        {
             _playerUnits += change;
+        else
+            _enemyUnits += change;
+
+        HideCounters();
+        UpdateCounters();
+    }
+
+    public void CreateUnits(int count, bool player)
+    {
+        if (player)
+        {
+            if (!ResourceManager.Instance.TryChangeUnits(count)) return;
         }
         else
         {
-            _enemyUnits += change;
+            if (!EnemyManager.Instance.TryChangeUnits(count)) return;
         }
-        HideCounters();
-        UpdateCounters();
+        ChangeUnitCount(count, player);
+    }
+
+    public void DestroyUnits(int count, bool player)
+    {
+        if (player)
+        {
+            if (!ResourceManager.Instance.TryChangeUnits(-count)) return;
+        }
+        else
+        {
+            if (!EnemyManager.Instance.TryChangeUnits(-count)) return;
+        }
+        ChangeUnitCount(-count, player);
     }
     private void UpdateCounters()
     {
@@ -110,7 +238,7 @@ public abstract class BaseNode : MonoBehaviour
     {
         if(_playerUnits == 0) _playerUnitCounter.gameObject.SetActive(false);
         if(_enemyUnits == 0) _enemyUnitCounter.gameObject.SetActive(false);
-
+    
     }
     public void ConnectNode(BaseNode node)
     {

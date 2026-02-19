@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BloodPump : BaseBuilding
+public class BloodPump : PlayerBuilding
 {
     private int maxBuildingIncrease;
     public BloodPump() : base(BuildingType.BloodPump)
@@ -20,14 +20,14 @@ public class BloodPump : BaseBuilding
 
     }
 
-    protected override void Disable()
+    public override void Disable()
     {
         if(!_active) return;
         base.Disable();
         ResourceManager.Instance.ChangeMaxBuildings(-maxBuildingIncrease);
     }
 
-    protected override void Enable()
+    public override void Enable()
     {
         if(_active) return;
         base.Enable();

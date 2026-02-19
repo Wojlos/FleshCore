@@ -6,8 +6,6 @@ public abstract class BaseBuilding : MonoBehaviour
     [SerializeField] private GameObject _disabledMarker;
     private BuildingType _type;
     protected BaseNode _node;
-    private List<ResourceCost> _upkeep = new List<ResourceCost>();
-    private float _upkeepTimer = 0;
     protected int _unitProductionPerSecond = 0;
 
     protected bool _active = true;
@@ -15,11 +13,6 @@ public abstract class BaseBuilding : MonoBehaviour
     protected BaseBuilding(BuildingType type)
     {
         _type = type;
-    }
-
-    public void SetUpkeep(List<ResourceCost> upkeep)
-    {
-        _upkeep = upkeep;
     }
     public void AssignNode(BaseNode node)
     {
@@ -39,20 +32,14 @@ public abstract class BaseBuilding : MonoBehaviour
 
     protected virtual void OnUpdate()
     {
-        _upkeepTimer += Time.deltaTime;
+        
+    }
 
-        if (_upkeepTimer >= 1f)
-        {
-            _upkeepTimer = 0f;
-            if(!ResourceManager.Instance.TryChangeResourcesCurrent(_upkeep, false))
-            {
-                Disable();
-            }
-            else
-            {
-                Enable();
-            }
-        }      
+    public virtual void ApplySettings(BuildingSettings settings)
+    {
+        if (settings == null) return;
+
+        SetUnitProduction(settings.unitProductionPerSecond);
     }
     public BuildingType GetType()=> _type;
     public void SetUnitProduction(int u)
@@ -60,16 +47,18 @@ public abstract class BaseBuilding : MonoBehaviour
         _unitProductionPerSecond = u;
         
     }
-    protected virtual void Disable()
+    public virtual void Disable()
     {
         _active = false;
-        _disabledMarker.SetActive(true);
+        if (_disabledMarker != null)
+            _disabledMarker.SetActive(true);
         
     }
-    protected virtual void Enable()
+    public virtual void Enable()
     {
         _active = true;
-        _disabledMarker.SetActive(false);
+        if (_disabledMarker != null)
+            _disabledMarker.SetActive(false);
     }
 
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class DefenceOutpost : BaseBuilding
+public class DefenceOutpost : PlayerBuilding
 {
     public DefenceOutpost() : base(BuildingType.DefenceOutpost)
     {
@@ -17,10 +17,7 @@ public class DefenceOutpost : BaseBuilding
         if (_unitProductionTimer >= 1f)
         {
             _unitProductionTimer = 0f;
-            if (ResourceManager.Instance.TryChangeUnits(_unitProductionPerSecond))
-            {
-                _node.ChangeUnitCount(_unitProductionPerSecond, true);
-            }
+            _node.CreateUnits(_unitProductionPerSecond, true);
         }
         
     }
