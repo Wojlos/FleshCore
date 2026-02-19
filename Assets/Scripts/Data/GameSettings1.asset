@@ -39,5 +39,6 @@ MonoBehaviour:
     sprite: {fileID: 57806773, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
     buildCost: []
     upkeep: []
-    maxUnitsIncrease: 15
-    unitProductionPerSecond: 3
+    maxUnitsIncrease: 100000
+    unitProductionPerSecond: 1
+  maxImmunoBuildings: 1

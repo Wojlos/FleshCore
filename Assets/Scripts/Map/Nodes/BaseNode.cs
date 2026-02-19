@@ -8,10 +8,11 @@ public abstract class BaseNode : MonoBehaviour
     [SerializeField] private UnitCounter _enemyUnitCounter;
     [SerializeField] private GameObject _unitTravelGroupPrefab;
 
-
     private List<BaseNode> _connectedNodes = new List<BaseNode>();
     private List<SplineContainer> _splineContainers = new List<SplineContainer>();
     private BaseBuilding _building;
+    private BaseStructure _structure;
+
 
     private int _playerUnits = 0;
     private int _enemyUnits = 0;
@@ -139,6 +140,22 @@ public abstract class BaseNode : MonoBehaviour
         _building = null;
         b.Cleanup();
         Destroy(b.gameObject);
+        
+    }
+
+    public BaseStructure GetStructure()=> _structure;
+
+    public void AssignStructure(BaseStructure structure)
+    {
+        _structure = structure;   
+    }
+
+    public void RemoveStructure()
+    {
+        var s = _structure;
+        _structure = null;
+        s.Cleanup();
+        Destroy(s.gameObject);
         
     }
 }

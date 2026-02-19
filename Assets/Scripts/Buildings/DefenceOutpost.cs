@@ -12,8 +12,6 @@ public class DefenceOutpost : BaseBuilding
 
         base.OnUpdate();
 
-        
-
         if (!_active) return;
         _unitProductionTimer += Time.deltaTime;
         if (_unitProductionTimer >= 1f)

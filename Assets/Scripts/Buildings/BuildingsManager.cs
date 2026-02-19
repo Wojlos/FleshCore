@@ -74,4 +74,6 @@ public class BuildingsManager : MonoBehaviour
         _allBuildings.Clear();
     }
 
+    public List<BaseBuilding> GetAllBuildings() => _allBuildings;
+
 }

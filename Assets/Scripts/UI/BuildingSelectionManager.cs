@@ -7,7 +7,7 @@ public enum BuildingType
 {
     BloodPump,
     Harvester,
-    DefenceOutpost
+    DefenceOutpost,
 }
 public class BuildingSelectionManager : MonoBehaviour
 {
