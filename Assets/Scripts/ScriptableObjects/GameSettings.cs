@@ -17,14 +17,15 @@ public class BuildingSettings
     public List<ResourceCost> upkeep = new List<ResourceCost>();
     public int maxUnitsIncrease = 1;
     public int unitProductionPerSecond = 0;
+    public int startHp = 30;
 }
 
 [System.Serializable]
 public class ImmunoBuildingSettings
 {
-    public StructureType type;
-    public Sprite sprite;
+    public BuildingType type;
     public int unitProductionPerSecond = 0;
+    public int startHp = 30;
 }
 
 [CreateAssetMenu(fileName = "GameSettings", menuName = "Scriptable Objects/GameSettings")]
@@ -39,7 +40,7 @@ public class GameSettings : ScriptableObject
     [Header("building settings")]
     public int pumpMaxBuildingIncrease = 1;
 
-    public List<BuildingSettings> buildingSettings = new List<BuildingSettings>();
+    public List<BuildingSettings> playerBuildingSettings = new List<BuildingSettings>();
     public List<ImmunoBuildingSettings> immunoBuildingSettings = new List<ImmunoBuildingSettings>();
 
     [Header("Enemy settings")]

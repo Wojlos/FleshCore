@@ -6,14 +6,16 @@ public abstract class BaseBuilding : MonoBehaviour
 {
     [SerializeField] private GameObject _disabledMarker;
     private BuildingType _type;
+    public ConflictSide Side { get; private set; }
     protected BaseNode _node;
     protected int _unitProductionPerSecond = 0;
 
     protected bool _active = true;
 
-    protected BaseBuilding(BuildingType type)
+    protected BaseBuilding(BuildingType type, ConflictSide side)
     {
         _type = type;
+        Side = side;
     }
     public void AssignNode(BaseNode node)
     {
@@ -41,8 +43,14 @@ public abstract class BaseBuilding : MonoBehaviour
         if (settings == null) return;
 
         SetUnitProduction(settings.unitProductionPerSecond);
+        var hs = GetComponent<HealthSystem>();
+        if (hs != null)
+        {
+            hs.MaxHealth = settings.startHp;
+            hs.HealToFull();
+        }
     }
-    public BuildingType GetType()=> _type;
+    public BuildingType GetBuildingType()=> _type;
     public void SetUnitProduction(int u)
     {
         _unitProductionPerSecond = u;

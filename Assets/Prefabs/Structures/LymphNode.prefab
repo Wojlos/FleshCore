@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7961767395199571150}
   - component: {fileID: 9127513956067821261}
   - component: {fileID: 6549059563395296873}
+  - component: {fileID: 3038574954303706114}
   m_Layer: 0
   m_Name: LymphNode
   m_TagString: Untagged
@@ -105,6 +106,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cf07d55c196edc4c96613752f322439, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LymphNode
+  _disabledMarker: {fileID: 7998641341174592362}
+--- !u!114 &3038574954303706114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4701776007487591278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44081c83e19fc8e45ac7fc0adce3935e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthSystem
+  maxHealth: 10
 --- !u!1 &7998641341174592362
 GameObject:
   m_ObjectHideFlags: 0

@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
 
         foreach(var n in nodes)
         {
-            var counter = n.GetUnitCounter();
+            var counter = n.GetPlayerUnitCounter();
             if (counter){
                 _selectedCounters.Add(counter);
                 counter.SelectUnits();    

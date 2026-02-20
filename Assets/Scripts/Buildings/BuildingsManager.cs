@@ -33,7 +33,7 @@ public class BuildingsManager : MonoBehaviour
         _allBuildings.Add(building);
         
         _settings = GameManager.Instance.GetGameSettings();
-        var buildingSettings = _settings.buildingSettings.Find(b => b.type == building.GetType());
+        var buildingSettings = _settings.playerBuildingSettings.Find(b => b.type == building.GetBuildingType());
         building.ApplySettings(buildingSettings);
         
         ResourceManager.Instance.ChangeBuiltBuildings(1);
@@ -47,7 +47,7 @@ public class BuildingsManager : MonoBehaviour
         ResourceManager.Instance.ChangeBuiltBuildings(-1);
 
         var building = node.GetBuilding();
-        var buildingSettings = _settings.buildingSettings.Find(b => b.type == building.GetType());
+        var buildingSettings = _settings.playerBuildingSettings.Find(b => b.type == building.GetBuildingType());
 
         ResourceManager.Instance.ChangeResourcesPerSecond(buildingSettings.upkeep, true);
         _allBuildings.Remove(node.GetBuilding());

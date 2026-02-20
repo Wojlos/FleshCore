@@ -1,20 +1,15 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public enum StructureType
-{
-    LymphNode
-}
-
 public class EnemyManager : MonoBehaviour
 {
     public static EnemyManager Instance;
-    private List<BaseStructure> _enemyStructures = new List<BaseStructure>();
-    private int _maxStructures = 1;
+    private List<BaseBuilding> _enemyBuildings = new List<BaseBuilding>();
+    private int _maxBuildings = 1;
     private int _currentUnits = 0;
     private int _maxUnits = 30;
 
-    [SerializeField] private GameObject _structurePrefab;
+    [SerializeField] private GameObject _buildingPrefab;
 
     private void Awake()
     {
@@ -26,20 +21,21 @@ public class EnemyManager : MonoBehaviour
         Instance = this;
         
         var settings = GameManager.Instance.GetGameSettings();
-        _maxStructures = settings.maxImmunoBuildings;
+        _maxBuildings = settings.maxImmunoBuildings;
         _maxUnits = settings.maxImmunoUnits;
     }
 
     void Update()
     {
-        if(_enemyStructures.Count <= _maxStructures)
+        if (_enemyBuildings.Count <= _maxBuildings)
         {
             var node = SelectRandomNode();
-            SpawnStructure(_structurePrefab, node);
+            if (node != null)
+                SpawnBuilding(_buildingPrefab, node);
         }
     }
 
-    private void SpawnStructure(GameObject prefab, BaseNode node)
+    private void SpawnBuilding(GameObject prefab, BaseNode node)
     {
         GameObject go = Instantiate(
                 prefab,
@@ -48,31 +44,30 @@ public class EnemyManager : MonoBehaviour
                 node.transform
             );
         go.transform.localScale = Vector3.one;
-        var structure = go.GetComponent<BaseStructure>();
-        _enemyStructures.Add(structure);
-        structure.AssignNode(node);
+        var building = go.GetComponent<BaseBuilding>();
+        _enemyBuildings.Add(building);
+        building.AssignNode(node);
+
+        var hs = building.GetComponent<HealthSystem>();
+        if (hs != null)
+            hs.OnDie += (_, _) => _enemyBuildings.Remove(building);
 
         var settings = GameManager.Instance.GetGameSettings();
-        var structureSettings = settings.immunoBuildingSettings.Find(s => s.type == structure.GetStructureType());
-        structure.ApplySettings(structureSettings);
+        var buildingSettings = settings.immunoBuildingSettings.Find(s => s.type == building.GetBuildingType());
+        ((EnemyBuilding)building).ApplySettings(buildingSettings);
     }
 
     private BaseNode SelectRandomNode()
     {
         var allNodes = MapManager.Instance.GetAllNodes();
-        var allPlayerBuildings = BuildingsManager.Instance.GetAllBuildings();
-        if(allNodes.Count == allPlayerBuildings.Count)
-        {
-            return null;
-        }
-        bool spotFound = false;
-        while (!spotFound)
+        if (allNodes.Count == 0) return null;
+        int attempts = 0;
+        while (attempts < allNodes.Count * 2)
         {
             var tempSpot = allNodes[Random.Range(0, allNodes.Count)];
             if (tempSpot.GetBuilding() == null)
-            {
                 return tempSpot;
-            }
+            attempts++;
         }
         return null;
     }

@@ -6,7 +6,7 @@ public abstract class PlayerBuilding : BaseBuilding
     private List<ResourceCost> _upkeep = new List<ResourceCost>();
     private float _upkeepTimer = 0;
 
-    protected PlayerBuilding(BuildingType type) : base(type)
+    protected PlayerBuilding(BuildingType type) : base(type, ConflictSide.Player)
     {
     }
 

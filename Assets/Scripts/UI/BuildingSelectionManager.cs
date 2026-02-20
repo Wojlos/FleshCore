@@ -92,7 +92,7 @@ public class BuildingSelectionManager : MonoBehaviour
     private void PopulateButtons()
     {
         OpenBuildingSelection();
-        var buildingsSettings = _settings.buildingSettings;
+        var buildingsSettings = _settings.playerBuildingSettings;
 
         foreach(var bs in buildingsSettings)
         {
@@ -127,7 +127,7 @@ public class BuildingSelectionManager : MonoBehaviour
             }
             if (isMax)
             {
-                if(b.GetType() != BuildingType.BloodPump)
+                if(b.GetBuildingType() != BuildingType.BloodPump)
                 {
                     b.Disable();
                     continue;

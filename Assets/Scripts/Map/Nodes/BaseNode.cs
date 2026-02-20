@@ -11,7 +11,6 @@ public abstract class BaseNode : MonoBehaviour
     private List<BaseNode> _connectedNodes = new List<BaseNode>();
     private List<SplineContainer> _splineContainers = new List<SplineContainer>();
     private BaseBuilding _building;
-    private BaseStructure _structure;
 
 
     private int _playerUnits = 0;
@@ -19,6 +18,7 @@ public abstract class BaseNode : MonoBehaviour
     private List<UnitTravelGroup> _attachedPlayerTravelGroups = new List<UnitTravelGroup>();
 
     private bool _inBattle = false;
+    private bool _sieging = false;
     private float _battleTimer = 0f;
     private const float _battleTickInterval = 1f;
     private const float _damageChance = 0.3f;
@@ -40,8 +40,8 @@ public abstract class BaseNode : MonoBehaviour
     private void CheckAndRunBattle()
     {
         bool bothSidesPresent = _playerUnits > 0 && _enemyUnits > 0;
-        bool playerSiegesStructure = _playerUnits > 0 && _enemyUnits == 0 && _structure != null;
-        bool enemySiegesBuilding = _enemyUnits > 0 && _playerUnits == 0 && _building != null;
+        bool playerSiegesEnemyBuilding = _playerUnits > 0 && _enemyUnits == 0 && _building != null && _building.Side == ConflictSide.Immuno;
+        bool enemySiegesPlayerBuilding = _enemyUnits > 0 && _playerUnits == 0 && _building != null && _building.Side == ConflictSide.Player;
 
         if (bothSidesPresent)
         {
@@ -58,12 +58,18 @@ public abstract class BaseNode : MonoBehaviour
                 ProcessBattleTick();
             }
         }
-        else if (playerSiegesStructure || enemySiegesBuilding)
+        else if (playerSiegesEnemyBuilding || enemySiegesPlayerBuilding)
         {
             if (_inBattle)
             {
                 FinishBattle();
                 _inBattle = false;
+            }
+
+            if (!_sieging)
+            {
+                _sieging = true;
+                _building.Disable();
             }
 
             _battleTimer += Time.deltaTime;
@@ -80,6 +86,14 @@ public abstract class BaseNode : MonoBehaviour
                 FinishBattle();
             }
             _inBattle = false;
+
+            if (_sieging)
+            {
+                _sieging = false;
+                if (_building != null)
+                    _building.Enable();
+            }
+
             _battleTimer = 0f;
         }
     }
@@ -90,63 +104,43 @@ public abstract class BaseNode : MonoBehaviour
 
     private void ProcessBattleTick()
     {
-        int playerKills = 0;
-        int enemyKills = 0;
+        int killedByPlayer = 0;
+        int killedByEnemy = 0;
 
         for (int i = 0; i < _playerUnits; i++)
         {
             if (Random.value <= _damageChance)
-            {
-                playerKills++;
-            }
+                killedByPlayer++;
         }
 
         for (int i = 0; i < _enemyUnits; i++)
         {
             if (Random.value <= _damageChance)
-            {
-                enemyKills++;
-            }
+                killedByEnemy++;
         }
 
-        playerKills = Mathf.Min(playerKills, _enemyUnits);
-        enemyKills = Mathf.Min(enemyKills, _playerUnits);
+        killedByPlayer = Mathf.Min(killedByPlayer, _enemyUnits);
+        killedByEnemy = Mathf.Min(killedByEnemy, _playerUnits);
 
-        if (playerKills > 0)
-        {
-            DestroyUnits(playerKills, false);
-        }
-        if (enemyKills > 0)
-        {
-            DestroyUnits(enemyKills, true);
-        }
-
+        if (killedByPlayer > 0)
+            DestroyUnits(killedByPlayer, false);
+        if (killedByEnemy > 0)
+            DestroyUnits(killedByEnemy, true);
     }
 
     private void ProcessSiegeTick()
     {
-        if (_playerUnits > 0 && _structure != null)
+        if (_building == null) return;
+
+        int attackerCount = _building.Side == ConflictSide.Immuno ? _playerUnits : _enemyUnits;
+        int hits = 0;
+        for (int i = 0; i < attackerCount; i++)
         {
-            int structureHits = 0;
-            for (int i = 0; i < _playerUnits; i++)
-            {
-                if (Random.value <= _damageChance)
-                    structureHits++;
-            }
-            if (structureHits > 0)
-                _structure.GetComponent<HealthSystem>().ApplyDamage(structureHits);
+            if (Random.value <= _damageChance)
+                hits++;
         }
-        else if (_enemyUnits > 0 && _building != null)
-        {
-            int buildingHits = 0;
-            for (int i = 0; i < _enemyUnits; i++)
-            {
-                if (Random.value <= _damageChance)
-                    buildingHits++;
-            }
-            if (buildingHits > 0)
-                _building.GetComponent<HealthSystem>().ApplyDamage(buildingHits);
-        }
+        if (hits > 0)
+            _building.GetComponent<HealthSystem>().ApplyDamage(hits);
     }
     
     public List<UnitTravelGroup> GetTravelGroups() => _attachedPlayerTravelGroups;
@@ -159,7 +153,7 @@ public abstract class BaseNode : MonoBehaviour
         _attachedPlayerTravelGroups.Remove(tg);
     }
     
-    public UnitCounter GetUnitCounter(){
+    public UnitCounter GetPlayerUnitCounter(){
         if(_playerUnits != 0)
         {
             return _playerUnitCounter;
@@ -289,22 +283,4 @@ public abstract class BaseNode : MonoBehaviour
         
     }
 
-    public BaseStructure GetStructure()=> _structure;
-
-    public void AssignStructure(BaseStructure structure)
-    {
-        _structure = structure;
-        var hs = _structure.GetComponent<HealthSystem>();
-        if (hs != null)
-            hs.OnDie += (_, _) => RemoveStructure();
-    }
-
-    public void RemoveStructure()
-    {
-        var s = _structure;
-        _structure = null;
-        s.Cleanup();
-        Destroy(s.gameObject);
-        
-    }
 }

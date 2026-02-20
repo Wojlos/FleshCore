@@ -39,7 +39,7 @@ public class BuildingButton : MonoBehaviour
 
     public List<ResourceCost> GetCost() => _buildCost;
     public List<ResourceCost> GetUpkeep() => _upkeep;
-    public BuildingType GetType() => _buildingType;
+    public BuildingType GetBuildingType() => _buildingType;
 
 
     public void Enable()
