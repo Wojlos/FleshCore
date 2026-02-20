@@ -39,7 +39,11 @@ public abstract class BaseNode : MonoBehaviour
 
     private void CheckAndRunBattle()
     {
-        if (_playerUnits > 0 && _enemyUnits > 0)
+        bool bothSidesPresent = _playerUnits > 0 && _enemyUnits > 0;
+        bool playerSiegesStructure = _playerUnits > 0 && _enemyUnits == 0 && _structure != null;
+        bool enemySiegesBuilding = _enemyUnits > 0 && _playerUnits == 0 && _building != null;
+
+        if (bothSidesPresent)
         {
             if (!_inBattle)
             {
@@ -52,6 +56,21 @@ public abstract class BaseNode : MonoBehaviour
             {
                 _battleTimer = 0f;
                 ProcessBattleTick();
+            }
+        }
+        else if (playerSiegesStructure || enemySiegesBuilding)
+        {
+            if (_inBattle)
+            {
+                FinishBattle();
+                _inBattle = false;
+            }
+
+            _battleTimer += Time.deltaTime;
+            if (_battleTimer >= _battleTickInterval)
+            {
+                _battleTimer = 0f;
+                ProcessSiegeTick();
             }
         }
         else
@@ -67,35 +86,6 @@ public abstract class BaseNode : MonoBehaviour
 
     private void FinishBattle()
     {
-        ConflictSide winner;
-        
-        if (_playerUnits > 0 && _enemyUnits == 0)
-        {
-            winner = ConflictSide.Player;
-        }
-        else if (_enemyUnits > 0 && _playerUnits == 0)
-        {
-            winner = ConflictSide.Immuno;
-        }
-        else
-        {
-            return;
-        }
-
-        if (winner == ConflictSide.Immuno)
-        {
-            if (_building != null)
-            {
-                _building.Disable();
-            }
-        }
-        else if (winner == ConflictSide.Player)
-        {
-            if (_structure != null)
-            {
-                _structure.Disable();
-            }
-        }
     }
 
     private void ProcessBattleTick()
@@ -129,6 +119,33 @@ public abstract class BaseNode : MonoBehaviour
         if (enemyKills > 0)
         {
             DestroyUnits(enemyKills, true);
+        }
+
+    }
+
+    private void ProcessSiegeTick()
+    {
+        if (_playerUnits > 0 && _structure != null)
+        {
+            int structureHits = 0;
+            for (int i = 0; i < _playerUnits; i++)
+            {
+                if (Random.value <= _damageChance)
+                    structureHits++;
+            }
+            if (structureHits > 0)
+                _structure.GetComponent<HealthSystem>().ApplyDamage(structureHits);
+        }
+        else if (_enemyUnits > 0 && _building != null)
+        {
+            int buildingHits = 0;
+            for (int i = 0; i < _enemyUnits; i++)
+            {
+                if (Random.value <= _damageChance)
+                    buildingHits++;
+            }
+            if (buildingHits > 0)
+                _building.GetComponent<HealthSystem>().ApplyDamage(buildingHits);
         }
     }
     
@@ -188,28 +205,26 @@ public abstract class BaseNode : MonoBehaviour
 
     public void CreateUnits(int count, bool player)
     {
+        int actual;
         if (player)
-        {
-            if (!ResourceManager.Instance.TryChangeUnits(count)) return;
-        }
+            actual = ResourceManager.Instance.TryChangeUnits(count);
         else
-        {
-            if (!EnemyManager.Instance.TryChangeUnits(count)) return;
-        }
-        ChangeUnitCount(count, player);
+            actual = EnemyManager.Instance.TryChangeUnits(count);
+
+        if (actual > 0)
+            ChangeUnitCount(actual, player);
     }
 
     public void DestroyUnits(int count, bool player)
     {
+        int actual;
         if (player)
-        {
-            if (!ResourceManager.Instance.TryChangeUnits(-count)) return;
-        }
+            actual = ResourceManager.Instance.TryChangeUnits(-count);
         else
-        {
-            if (!EnemyManager.Instance.TryChangeUnits(-count)) return;
-        }
-        ChangeUnitCount(-count, player);
+            actual = EnemyManager.Instance.TryChangeUnits(-count);
+
+        if (actual < 0)
+            ChangeUnitCount(actual, player);
     }
     private void UpdateCounters()
     {
@@ -258,7 +273,10 @@ public abstract class BaseNode : MonoBehaviour
 
     public void AssignBuilding(BaseBuilding building)
     {
-        _building = building;   
+        _building = building;
+        var hs = _building.GetComponent<HealthSystem>();
+        if (hs != null)
+            hs.OnDie += (_, _) => RemoveBuilding();
     }
 
     public BaseBuilding GetBuilding()=> _building;
@@ -275,7 +293,10 @@ public abstract class BaseNode : MonoBehaviour
 
     public void AssignStructure(BaseStructure structure)
     {
-        _structure = structure;   
+        _structure = structure;
+        var hs = _structure.GetComponent<HealthSystem>();
+        if (hs != null)
+            hs.OnDie += (_, _) => RemoveStructure();
     }
 
     public void RemoveStructure()

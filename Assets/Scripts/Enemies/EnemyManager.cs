@@ -77,17 +77,22 @@ public class EnemyManager : MonoBehaviour
         return null;
     }
 
-    public bool TryChangeUnits(int change)
+    public int TryChangeUnits(int change)
     {
         int tempCount = _currentUnits + change;
-        if(tempCount < 0 || tempCount > _maxUnits)
+        if (tempCount < 0)
         {
-            return false;
+            int actual = _currentUnits;
+            _currentUnits = 0;
+            return -actual;
         }
-        else
+        if (tempCount > _maxUnits)
         {
-            _currentUnits = tempCount;
-            return true;
+            int actual = _maxUnits - _currentUnits;
+            _currentUnits = _maxUnits;
+            return actual;
         }
+        _currentUnits = tempCount;
+        return change;
     }
 }

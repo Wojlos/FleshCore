@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a12471cd06d2624c9c6aabe8a711f2d, type: 3}
   m_Name: GameSettings1
   m_EditorClassIdentifier: Assembly-CSharp::GameSettings
-  startingMaxBuildings: 1
-  startingMaxUnits: 0
+  startingMaxBuildings: 100
+  startingMaxUnits: 10
   startingResources:
   - type: 0
     cost: 4
@@ -21,7 +21,7 @@ MonoBehaviour:
     cost: 4
   - type: 2
     cost: 4
-  pumpMaxBuildingIncrease: 2
+  pumpMaxBuildingIncrease: 3
   buildingSettings:
   - type: 0
     sprite: {fileID: 1569033066621811975, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
@@ -39,6 +39,11 @@ MonoBehaviour:
     sprite: {fileID: 57806773, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
     buildCost: []
     upkeep: []
-    maxUnitsIncrease: 100000
+    maxUnitsIncrease: 20
+    unitProductionPerSecond: 10
+  immunoBuildingSettings:
+  - type: 0
+    sprite: {fileID: -1911830413, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
     unitProductionPerSecond: 1
-  maxImmunoBuildings: 1
+  maxImmunoBuildings: 2
+  maxImmunoUnits: 30

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(HealthSystem))]
 public abstract class BaseBuilding : MonoBehaviour
 {
     [SerializeField] private GameObject _disabledMarker;

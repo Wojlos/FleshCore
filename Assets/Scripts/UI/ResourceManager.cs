@@ -184,19 +184,28 @@ public class ResourceManager : MonoBehaviour
         return true;
     }
 
-    public bool TryChangeUnits(int change)
+    public int TryChangeUnits(int change)
     {
         int tempCount = _currentUnits + change;
-        if(tempCount < 0 || tempCount > _maxUnits)
+        Debug.Log("change" + tempCount);
+     
+        if (tempCount < 0)
         {
-            return false;
-        }
-        else
-        {
-            _currentUnits = tempCount;
+            int actual = _currentUnits;
+            _currentUnits = 0;
             UpdateCounters();
-            return true;
+            return -actual;
         }
+        if (tempCount > _maxUnits)
+        {
+            int actual = _maxUnits - _currentUnits;
+            _currentUnits = _maxUnits;
+            UpdateCounters();
+            return actual;
+        }
+        _currentUnits = tempCount;
+        UpdateCounters();
+        return change;
     }
 
 
