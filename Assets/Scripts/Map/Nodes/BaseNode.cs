@@ -143,6 +143,8 @@ public abstract class BaseNode : MonoBehaviour
             _building.GetComponent<HealthSystem>().ApplyDamage(hits);
     }
     
+    public bool IsInBattle() => _inBattle;
+    public int GetEnemyUnits() => _enemyUnits;
     public List<UnitTravelGroup> GetTravelGroups() => _attachedPlayerTravelGroups;
     public void AddPlayerTravelGroup(UnitTravelGroup tg)
     {

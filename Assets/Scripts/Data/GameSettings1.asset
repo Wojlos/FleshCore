@@ -22,28 +22,24 @@ MonoBehaviour:
   - type: 2
     cost: 4
   pumpMaxBuildingIncrease: 3
-  buildingSettings:
+  playerBuildingSettings:
   - type: 0
     sprite: {fileID: 1569033066621811975, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
     buildCost: []
     upkeep: []
     maxUnitsIncrease: 5
     unitProductionPerSecond: 0
-  - type: 1
-    sprite: {fileID: -1231628468, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
-    buildCost: []
-    upkeep: []
-    maxUnitsIncrease: 5
-    unitProductionPerSecond: 0
+    startHp: 30
   - type: 2
     sprite: {fileID: 57806773, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
     buildCost: []
     upkeep: []
-    maxUnitsIncrease: 20
-    unitProductionPerSecond: 10
+    maxUnitsIncrease: 30
+    unitProductionPerSecond: 5
+    startHp: 30
   immunoBuildingSettings:
-  - type: 0
-    sprite: {fileID: -1911830413, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
-    unitProductionPerSecond: 1
-  maxImmunoBuildings: 2
+  - type: 3
+    unitProductionPerSecond: 5
+    startHp: 30
+  maxImmunoBuildings: 0
   maxImmunoUnits: 30

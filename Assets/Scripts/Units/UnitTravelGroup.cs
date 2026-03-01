@@ -58,6 +58,35 @@ public class UnitTravelGroup : MonoBehaviour
         if (_splineAnimator == null)
             yield break;
 
+        if (_stepDelaySeconds > 0f)
+            yield return new WaitForSeconds(_stepDelaySeconds);
+
+        int unitsBeforeBattle = _currentNode.GetAllPlayerUnits();
+        int enemyUnitsPresent = _currentNode.GetEnemyUnits();
+
+        if (enemyUnitsPresent > 0)
+        {
+            while (_currentNode.GetEnemyUnits() > 0 && _currentNode.GetAllPlayerUnits() > 0)
+                yield return null;
+
+            int unitsAfterBattle = _currentNode.GetAllPlayerUnits();
+            int totalDamage = unitsBeforeBattle - unitsAfterBattle;
+
+            if (totalDamage > 0 && unitsBeforeBattle > 0)
+            {
+                float damageRatio = (float)totalDamage / unitsBeforeBattle;
+                int travelGroupDamage = Mathf.RoundToInt(_units * damageRatio);
+                _units -= travelGroupDamage;
+
+                if (_units <= 0)
+                {
+                    _currentNode.RemovePlayerTravelGroup(this);
+                    Destroy(gameObject);
+                    yield break;
+                }
+            }
+        }
+
         while (_path.Count > 0)
         {
             if (_travelCanceled)
@@ -96,6 +125,32 @@ public class UnitTravelGroup : MonoBehaviour
             _currentNode = _nextNode;
             _currentNode.ChangeUnitCount(_units, true);
             _currentNode.AddPlayerTravelGroup(this);
+
+            int nodeUnitsBeforeBattle = _currentNode.GetAllPlayerUnits();
+            int nodeEnemyUnits = _currentNode.GetEnemyUnits();
+
+            if (nodeEnemyUnits > 0)
+            {
+                while (_currentNode.GetEnemyUnits() > 0 && _currentNode.GetAllPlayerUnits() > 0)
+                    yield return null;
+
+                int nodeUnitsAfterBattle = _currentNode.GetAllPlayerUnits();
+                int nodeTotalDamage = nodeUnitsBeforeBattle - nodeUnitsAfterBattle;
+
+                if (nodeTotalDamage > 0 && nodeUnitsBeforeBattle > 0)
+                {
+                    float nodeDamageRatio = (float)nodeTotalDamage / nodeUnitsBeforeBattle;
+                    int nodeTravelGroupDamage = Mathf.RoundToInt(_units * nodeDamageRatio);
+                    _units -= nodeTravelGroupDamage;
+
+                    if (_units <= 0)
+                    {
+                        _currentNode.RemovePlayerTravelGroup(this);
+                        Destroy(gameObject);
+                        yield break;
+                    }
+                }
+            }
 
             if (_stepDelaySeconds > 0f)
                 yield return new WaitForSeconds(_stepDelaySeconds);

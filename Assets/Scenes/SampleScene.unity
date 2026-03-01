@@ -1151,7 +1151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 158cfc15a9a02d64d838ca3ca8d4a658, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyManager
-  _structurePrefab: {fileID: 4701776007487591278, guid: 4d7b76b8c1279c64493b74b0b96705c5, type: 3}
+  _buildingPrefab: {fileID: 4701776007487591278, guid: 4d7b76b8c1279c64493b74b0b96705c5, type: 3}
 --- !u!1 &876492694
 GameObject:
   m_ObjectHideFlags: 0

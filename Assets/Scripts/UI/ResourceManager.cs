@@ -187,7 +187,6 @@ public class ResourceManager : MonoBehaviour
     public int TryChangeUnits(int change)
     {
         int tempCount = _currentUnits + change;
-        Debug.Log("change" + tempCount);
      
         if (tempCount < 0)
         {
