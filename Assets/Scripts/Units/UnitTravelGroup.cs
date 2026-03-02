@@ -18,6 +18,7 @@ public class UnitTravelGroup : MonoBehaviour
     private SplineAnimate _splineAnimator;
     private Coroutine _travelRoutine;
     private bool _travelCanceled = false;
+    private ConflictSide _side;
 
     private void Awake()
     {
@@ -26,10 +27,11 @@ public class UnitTravelGroup : MonoBehaviour
             Debug.LogError($"{name}: Missing SplineAnimate component.");
     }
 
-    public void SetupTravel(int units, BaseNode start, BaseNode destination)
+    public void SetupTravel(int units, BaseNode start, BaseNode destination, ConflictSide side)
     {
         _units = units;
         _destination = destination;
+        _side = side;
 
         var newPath = PathfindingManager.Instance.GetPath(start, destination);
         if (newPath == null || newPath.Count == 0)
@@ -61,15 +63,15 @@ public class UnitTravelGroup : MonoBehaviour
         if (_stepDelaySeconds > 0f)
             yield return new WaitForSeconds(_stepDelaySeconds);
 
-        int unitsBeforeBattle = _currentNode.GetAllPlayerUnits();
-        int enemyUnitsPresent = _currentNode.GetEnemyUnits();
+        int unitsBeforeBattle = _currentNode.GetUnits(_side);
+        int opposingUnitsPresent = _currentNode.GetOpposingUnits(_side);
 
-        if (enemyUnitsPresent > 0)
+        if (opposingUnitsPresent > 0)
         {
-            while (_currentNode.GetEnemyUnits() > 0 && _currentNode.GetAllPlayerUnits() > 0)
+            while (_currentNode.GetOpposingUnits(_side) > 0 && _currentNode.GetUnits(_side) > 0)
                 yield return null;
 
-            int unitsAfterBattle = _currentNode.GetAllPlayerUnits();
+            int unitsAfterBattle = _currentNode.GetUnits(_side);
             int totalDamage = unitsBeforeBattle - unitsAfterBattle;
 
             if (totalDamage > 0 && unitsBeforeBattle > 0)
@@ -80,7 +82,7 @@ public class UnitTravelGroup : MonoBehaviour
 
                 if (_units <= 0)
                 {
-                    _currentNode.RemovePlayerTravelGroup(this);
+                    _currentNode.RemoveTravelGroup(this, _side);
                     Destroy(gameObject);
                     yield break;
                 }
@@ -101,8 +103,8 @@ public class UnitTravelGroup : MonoBehaviour
 
             var container = FindCommonSplineContainer(_currentNode, _nextNode);
 
-            _currentNode.ChangeUnitCount(-_units, true);
-            _currentNode.RemovePlayerTravelGroup(this);
+            _currentNode.ChangeUnitCount(-_units, _side == ConflictSide.Player);
+            _currentNode.RemoveTravelGroup(this, _side);
 
             if (container == null)
             {
@@ -123,18 +125,18 @@ public class UnitTravelGroup : MonoBehaviour
             }
 
             _currentNode = _nextNode;
-            _currentNode.ChangeUnitCount(_units, true);
-            _currentNode.AddPlayerTravelGroup(this);
+            _currentNode.ChangeUnitCount(_units, _side == ConflictSide.Player);
+            _currentNode.AddTravelGroup(this, _side);
 
-            int nodeUnitsBeforeBattle = _currentNode.GetAllPlayerUnits();
-            int nodeEnemyUnits = _currentNode.GetEnemyUnits();
+            int nodeUnitsBeforeBattle = _currentNode.GetUnits(_side);
+            int nodeOpposingUnits = _currentNode.GetOpposingUnits(_side);
 
-            if (nodeEnemyUnits > 0)
+            if (nodeOpposingUnits > 0)
             {
-                while (_currentNode.GetEnemyUnits() > 0 && _currentNode.GetAllPlayerUnits() > 0)
+                while (_currentNode.GetOpposingUnits(_side) > 0 && _currentNode.GetUnits(_side) > 0)
                     yield return null;
 
-                int nodeUnitsAfterBattle = _currentNode.GetAllPlayerUnits();
+                int nodeUnitsAfterBattle = _currentNode.GetUnits(_side);
                 int nodeTotalDamage = nodeUnitsBeforeBattle - nodeUnitsAfterBattle;
 
                 if (nodeTotalDamage > 0 && nodeUnitsBeforeBattle > 0)
@@ -145,7 +147,7 @@ public class UnitTravelGroup : MonoBehaviour
 
                     if (_units <= 0)
                     {
-                        _currentNode.RemovePlayerTravelGroup(this);
+                        _currentNode.RemoveTravelGroup(this, _side);
                         Destroy(gameObject);
                         yield break;
                     }
@@ -155,7 +157,7 @@ public class UnitTravelGroup : MonoBehaviour
             if (_stepDelaySeconds > 0f)
                 yield return new WaitForSeconds(_stepDelaySeconds);
         }
-        _currentNode.RemovePlayerTravelGroup(this);
+        _currentNode.RemoveTravelGroup(this, _side);
         Destroy(gameObject);
         _travelRoutine = null;
     }

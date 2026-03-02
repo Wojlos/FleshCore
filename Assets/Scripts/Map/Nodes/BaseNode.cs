@@ -16,6 +16,7 @@ public abstract class BaseNode : MonoBehaviour
     private int _playerUnits = 0;
     private int _enemyUnits = 0;
     private List<UnitTravelGroup> _attachedPlayerTravelGroups = new List<UnitTravelGroup>();
+    private List<UnitTravelGroup> _attachedEnemyTravelGroups = new List<UnitTravelGroup>();
 
     private bool _inBattle = false;
     private bool _sieging = false;
@@ -154,6 +155,23 @@ public abstract class BaseNode : MonoBehaviour
     {
         _attachedPlayerTravelGroups.Remove(tg);
     }
+    public void AddTravelGroup(UnitTravelGroup tg, ConflictSide side)
+    {
+        if (side == ConflictSide.Player)
+            AddPlayerTravelGroup(tg);
+        else
+            _attachedEnemyTravelGroups.Add(tg);
+    }
+    public void RemoveTravelGroup(UnitTravelGroup tg, ConflictSide side)
+    {
+        if (side == ConflictSide.Player)
+            RemovePlayerTravelGroup(tg);
+        else
+            _attachedEnemyTravelGroups.Remove(tg);
+    }
+    public List<UnitTravelGroup> GetEnemyTravelGroups() => _attachedEnemyTravelGroups;
+    public int GetUnits(ConflictSide side) => side == ConflictSide.Player ? _playerUnits : _enemyUnits;
+    public int GetOpposingUnits(ConflictSide side) => side == ConflictSide.Player ? _enemyUnits : _playerUnits;
     
     public UnitCounter GetPlayerUnitCounter(){
         if(_playerUnits != 0)
@@ -177,7 +195,7 @@ public abstract class BaseNode : MonoBehaviour
             Quaternion.identity
         );
         var utr = go.GetComponent<UnitTravelGroup>();
-        utr.SetupTravel(units, this, destination);
+        utr.SetupTravel(units, this, destination, ConflictSide.Player);
     }
 
     private void CancelPlayerTravelGroups()
