@@ -70,4 +70,6 @@ public abstract class BaseBuilding : MonoBehaviour
             _disabledMarker.SetActive(false);
     }
 
+    public virtual void OnEncounterReported(BaseNode encounterNode, UnitTravelGroup reporter) { }
+
 }

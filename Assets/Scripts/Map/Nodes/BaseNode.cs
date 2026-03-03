@@ -18,11 +18,13 @@ public abstract class BaseNode : MonoBehaviour
     private List<UnitTravelGroup> _attachedPlayerTravelGroups = new List<UnitTravelGroup>();
     private List<UnitTravelGroup> _attachedEnemyTravelGroups = new List<UnitTravelGroup>();
 
+    private BaseNode _rallyPointNode;
+
     private bool _inBattle = false;
     private bool _sieging = false;
     private float _battleTimer = 0f;
     private const float _battleTickInterval = 1f;
-    private const float _damageChance = 0.3f;
+    private const float _damageChance = 0.1f;
 
 
     private void Awake() {
@@ -238,7 +240,15 @@ public abstract class BaseNode : MonoBehaviour
             actual = EnemyManager.Instance.TryChangeUnits(count);
 
         if (actual > 0)
+        {
             ChangeUnitCount(actual, player);
+
+            if (_rallyPointNode != null && _rallyPointNode != this)
+            {
+                ConflictSide side = player ? ConflictSide.Player : ConflictSide.Immuno;
+                SendUnitsDirected(actual, _rallyPointNode, side);
+            }
+        }
     }
 
     public void DestroyUnits(int count, bool player)
@@ -296,6 +306,18 @@ public abstract class BaseNode : MonoBehaviour
     {
         _splineContainers.Add(s);
     }
+
+    public UnitTravelGroup SendUnitsDirected(int units, BaseNode destination, ConflictSide side)
+    {
+        GameObject go = Instantiate(_unitTravelGroupPrefab, transform.position, Quaternion.identity);
+        var tg = go.GetComponent<UnitTravelGroup>();
+        tg.SetupDirected(units, this, destination, side);
+        return tg;
+    }
+
+    public void SetRallyPoint(BaseNode target) { _rallyPointNode = target; }
+    public void ClearRallyPoint() { _rallyPointNode = null; }
+    public BaseNode GetRallyPoint() => _rallyPointNode;
 
     public void AssignBuilding(BaseBuilding building)
     {

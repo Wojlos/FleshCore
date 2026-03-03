@@ -26,6 +26,8 @@ public class ImmunoBuildingSettings
     public BuildingType type;
     public int unitProductionPerSecond = 0;
     public int startHp = 30;
+    public int maxUnitsIncrease = 30;
+
 }
 
 [CreateAssetMenu(fileName = "GameSettings", menuName = "Scriptable Objects/GameSettings")]
@@ -46,8 +48,10 @@ public class GameSettings : ScriptableObject
     [Header("Enemy settings")]
 
     public int maxImmunoBuildings = 1;
-    public int maxImmunoUnits = 30;
+    public int maxStartImmunoUnits = 30;
     public int maxImmunoPatroleGroups = 1;
+    public int immunoUnitsToSpawnLymphNode = 15;
+
     public int minPatroleSize = 10;
 
 

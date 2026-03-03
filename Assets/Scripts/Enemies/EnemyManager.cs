@@ -22,7 +22,7 @@ public class EnemyManager : MonoBehaviour
         
         var settings = GameManager.Instance.GetGameSettings();
         _maxBuildings = settings.maxImmunoBuildings;
-        _maxUnits = settings.maxImmunoUnits;
+        _maxUnits = settings.maxStartImmunoUnits;
     }
 
     void Update()
@@ -55,6 +55,9 @@ public class EnemyManager : MonoBehaviour
         var settings = GameManager.Instance.GetGameSettings();
         var buildingSettings = settings.immunoBuildingSettings.Find(s => s.type == building.GetBuildingType());
         ((EnemyBuilding)building).ApplySettings(buildingSettings);
+
+        if (buildingSettings != null)
+            _maxUnits += buildingSettings.maxUnitsIncrease;
     }
 
     private BaseNode SelectRandomNode()
@@ -70,6 +73,16 @@ public class EnemyManager : MonoBehaviour
             attempts++;
         }
         return null;
+    }
+
+    public bool TrySpawnLymphNode(BaseNode node, int unitCost)
+    {
+        if (node.GetBuilding() != null) return false;
+        if (node.GetUnits(ConflictSide.Immuno) < unitCost) return false;
+
+        node.DestroyUnits(unitCost, false);
+        SpawnBuilding(_buildingPrefab, node);
+        return true;
     }
 
     public int TryChangeUnits(int change)

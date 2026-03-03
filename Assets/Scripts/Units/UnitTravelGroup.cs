@@ -43,6 +43,9 @@ public class UnitTravelGroup : MonoBehaviour
     private BaseBuilding _originBuilding;
     private bool _tracksOriginBuilding;
 
+    private bool _fleeingEncounter;
+    private BaseNode _encounterNode;
+
     // ──────────────────────────────────────────────
     // Lifecycle
     // ──────────────────────────────────────────────
@@ -115,6 +118,25 @@ public class UnitTravelGroup : MonoBehaviour
         Disband();
     }
 
+    public int GetUnits() => _units;
+    public BaseNode GetCurrentNode() => _currentNode;
+    public ConflictSide GetSide() => _side;
+
+    public void RedirectTo(BaseNode destination)
+    {
+        _mode = UnitMode.Directed;
+
+        BaseNode fromNode = (_state == UnitState.Moving && _nextNode != null) ? _nextNode : _currentNode;
+        if (fromNode == null) return;
+
+        var newPath = PathfindingManager.Instance.GetPath(fromNode, destination);
+        if (newPath == null || newPath.Count == 0)
+            return;
+
+        _path = newPath;
+        DequeueNextNode();
+    }
+
     // ──────────────────────────────────────────────
     // Setup
     // ──────────────────────────────────────────────
@@ -171,6 +193,29 @@ public class UnitTravelGroup : MonoBehaviour
             return;
         }
 
+        if (!_fleeingEncounter && HasConflict())
+        {
+            bool hasOpposingUnits = _currentNode.GetOpposingUnits(_side) > 0;
+
+            if (!hasOpposingUnits && _mode == UnitMode.Patrol && _side == ConflictSide.Immuno
+                && _currentNode != _originNode)
+            {
+                _encounterNode = _currentNode;
+                _fleeingEncounter = true;
+                SwitchToDirectedRecall();
+                return;
+            }
+
+            if (_encounterNode == null && _mode == UnitMode.Patrol && _side == ConflictSide.Immuno
+                && _currentNode != _originNode)
+            {
+                _encounterNode = _currentNode;
+            }
+
+            EnterFighting();
+            return;
+        }
+
         if (_mode == UnitMode.Patrol && IsOriginUnderAttack())
         {
             SwitchToDirectedRecall();
@@ -180,12 +225,6 @@ public class UnitTravelGroup : MonoBehaviour
         if (_waitTimer > 0f)
         {
             _waitTimer -= Time.deltaTime;
-            return;
-        }
-
-        if (HasConflict())
-        {
-            EnterFighting();
             return;
         }
 
@@ -208,6 +247,12 @@ public class UnitTravelGroup : MonoBehaviour
 
     private void EnterMoving()
     {
+        if (!_fleeingEncounter && HasConflict())
+        {
+            EnterFighting();
+            return;
+        }
+
         _state = UnitState.Moving;
         _currentNode.ChangeUnitCount(-_units, _side == ConflictSide.Player);
         UnregisterFromNode();
@@ -289,6 +334,9 @@ public class UnitTravelGroup : MonoBehaviour
             return;
         }
 
+        if (_encounterNode != null && !_fleeingEncounter)
+            _fleeingEncounter = true;
+
         EnterWaiting();
     }
 
@@ -349,6 +397,9 @@ public class UnitTravelGroup : MonoBehaviour
         }
         else
         {
+            if (_fleeingEncounter && _encounterNode != null && _originBuilding != null)
+                _originBuilding.OnEncounterReported(_encounterNode, this);
+
             Disband();
         }
     }
