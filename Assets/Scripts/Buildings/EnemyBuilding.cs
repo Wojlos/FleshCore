@@ -24,13 +24,15 @@ public abstract class EnemyBuilding : BaseBuilding
     {
         base.OnUpdate();
 
-        if (!_active) return;
+        if (!_active || _unitProductionPerSecond <= 0) return;
 
+        float spawnInterval = 1f / _unitProductionPerSecond;
         _internalTimer += Time.deltaTime;
-        if (_internalTimer >= 1f)
+        
+        if (_internalTimer >= spawnInterval)
         {
-            _internalTimer = 0f;
-            _node.CreateUnits(_unitProductionPerSecond, false);
+            _internalTimer -= spawnInterval;
+            _node.CreateUnits(1, false);
         }
     }
 }

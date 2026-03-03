@@ -19,7 +19,6 @@ public enum UnitMode
 public class UnitTravelGroup : MonoBehaviour
 {
     [SerializeField] private GameObject _visualisation;
-    [SerializeField] private float _stepDelaySeconds = 1f;
 
     private int _units;
     private List<BaseNode> _path = new List<BaseNode>();
@@ -37,6 +36,8 @@ public class UnitTravelGroup : MonoBehaviour
     private ConflictSide _side;
 
     private float _waitTimer;
+    private float _stepDelay;
+    private float _movementSpeed;
     private int _unitsBeforeBattle;
     private bool _isRegisteredOnNode;
 
@@ -151,6 +152,18 @@ public class UnitTravelGroup : MonoBehaviour
         _originNode = start;
         _mode = mode;
 
+        var settings = GameManager.Instance.GetGameSettings();
+        if (side == ConflictSide.Player)
+        {
+            _stepDelay = Random.Range(settings.playerStepDelayMin, settings.playerStepDelayMax);
+            _movementSpeed = Random.Range(settings.playerSpeedMin, settings.playerSpeedMax);
+        }
+        else
+        {
+            _stepDelay = Random.Range(settings.enemyStepDelayMin, settings.enemyStepDelayMax);
+            _movementSpeed = Random.Range(settings.enemySpeedMin, settings.enemySpeedMax);
+        }
+
         var building = start.GetBuilding();
         _originBuilding = (building != null && building.Side == side) ? building : null;
         _tracksOriginBuilding = _originBuilding != null;
@@ -182,7 +195,7 @@ public class UnitTravelGroup : MonoBehaviour
     private void EnterWaiting()
     {
         _state = UnitState.Waiting;
-        _waitTimer = _stepDelaySeconds;
+        _waitTimer = _stepDelay;
     }
 
     private void UpdateWaiting()
@@ -272,6 +285,7 @@ public class UnitTravelGroup : MonoBehaviour
         {
             _splineAnimator.Container = container;
             SetSplineDirection(container, _currentNode.transform.position, _nextNode.transform.position);
+            _splineAnimator.MaxSpeed = _movementSpeed;
             _splineAnimator.Play();
 
             while (_splineAnimator.IsPlaying)

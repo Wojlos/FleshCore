@@ -23,13 +23,23 @@ public abstract class BaseNode : MonoBehaviour
     private bool _inBattle = false;
     private bool _sieging = false;
     private float _battleTimer = 0f;
-    private const float _battleTickInterval = 1f;
-    private const float _damageChance = 0.1f;
+    private float _battleTickInterval;
+    private float _playerBattleDamageChance;
+    private float _enemyBattleDamageChance;
+    private float _playerSiegeDamageChance;
+    private float _enemySiegeDamageChance;
 
 
     private void Awake() {
         _playerUnitCounter.ConnectNode(this);
         _enemyUnitCounter.ConnectNode(this);
+
+        var settings = GameManager.Instance.GetGameSettings();
+        _battleTickInterval = settings.battleTickInterval;
+        _playerBattleDamageChance = settings.playerBattleDamageChance;
+        _enemyBattleDamageChance = settings.enemyBattleDamageChance;
+        _playerSiegeDamageChance = settings.playerSiegeDamageChance;
+        _enemySiegeDamageChance = settings.enemySiegeDamageChance;
 
         UpdateCounters();
         HideCounters();
@@ -112,13 +122,13 @@ public abstract class BaseNode : MonoBehaviour
 
         for (int i = 0; i < _playerUnits; i++)
         {
-            if (Random.value <= _damageChance)
+            if (Random.value <= _playerBattleDamageChance)
                 killedByPlayer++;
         }
 
         for (int i = 0; i < _enemyUnits; i++)
         {
-            if (Random.value <= _damageChance)
+            if (Random.value <= _enemyBattleDamageChance)
                 killedByEnemy++;
         }
 
@@ -135,11 +145,14 @@ public abstract class BaseNode : MonoBehaviour
     {
         if (_building == null) return;
 
-        int attackerCount = _building.Side == ConflictSide.Immuno ? _playerUnits : _enemyUnits;
+        bool playerAttacking = _building.Side == ConflictSide.Immuno;
+        int attackerCount = playerAttacking ? _playerUnits : _enemyUnits;
+        float damageChance = playerAttacking ? _playerSiegeDamageChance : _enemySiegeDamageChance;
+        
         int hits = 0;
         for (int i = 0; i < attackerCount; i++)
         {
-            if (Random.value <= _damageChance)
+            if (Random.value <= damageChance)
                 hits++;
         }
         if (hits > 0)

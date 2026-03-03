@@ -12,12 +12,15 @@ public class DefenceOutpost : PlayerBuilding
 
         base.OnUpdate();
 
-        if (!_active) return;
+        if (!_active || _unitProductionPerSecond <= 0) return;
+
+        float spawnInterval = 1f / _unitProductionPerSecond;
         _unitProductionTimer += Time.deltaTime;
-        if (_unitProductionTimer >= 1f)
+        
+        if (_unitProductionTimer >= spawnInterval)
         {
-            _unitProductionTimer = 0f;
-            _node.CreateUnits(_unitProductionPerSecond, true);
+            _unitProductionTimer -= spawnInterval;
+            _node.CreateUnits(1, true);
         }
         
     }
