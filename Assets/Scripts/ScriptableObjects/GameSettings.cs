@@ -47,6 +47,8 @@ public class GameSettings : ScriptableObject
 
     public int maxImmunoBuildings = 1;
     public int maxImmunoUnits = 30;
+    public int maxImmunoPatroleGroups = 1;
+    public int minPatroleSize = 10;
 
 
 }

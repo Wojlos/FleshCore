@@ -186,6 +186,18 @@ public abstract class BaseNode : MonoBehaviour
 
     }
     public List<SplineContainer> GetSplineContainers()=> _splineContainers;
+    public UnitTravelGroup SendPatrol(int units, ConflictSide side)
+    {
+        if (_connectedNodes == null || _connectedNodes.Count == 0) return null;
+
+        BaseNode target = _connectedNodes[Random.Range(0, _connectedNodes.Count)];
+
+        GameObject go = Instantiate(_unitTravelGroupPrefab, transform.position, Quaternion.identity);
+        var tg = go.GetComponent<UnitTravelGroup>();
+        tg.SetupPatrol(units, this, target, side);
+        return tg;
+    }
+
     public void SendUnits(int units, BaseNode destination)
     {
         CancelPlayerTravelGroups();
@@ -195,12 +207,12 @@ public abstract class BaseNode : MonoBehaviour
             Quaternion.identity
         );
         var utr = go.GetComponent<UnitTravelGroup>();
-        utr.SetupTravel(units, this, destination, ConflictSide.Player);
+        utr.SetupDirected(units, this, destination, ConflictSide.Player);
     }
 
     private void CancelPlayerTravelGroups()
     {
-        foreach( var tg in _attachedPlayerTravelGroups)
+        foreach( var tg in _attachedPlayerTravelGroups.ToArray())
         {
             tg.CancelTravel();
         }
