@@ -53,6 +53,7 @@ public class GameSettings : ScriptableObject
     public int immunoUnitsToSpawnLymphNode = 15;
 
     public int minPatroleSize = 10;
+    public float lymphNodeAlertDuration = 30f;
 
 
 }

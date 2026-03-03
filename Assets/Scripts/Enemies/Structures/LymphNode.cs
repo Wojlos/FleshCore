@@ -8,6 +8,8 @@ public class LymphNode : EnemyBuilding
     private int _minPatrolSize;
     private bool _patrolsBlocked;
     private int _immunoUnitsToSpawnLymphNode;
+    private float _alertDuration;
+    private float _alertStartTime;
 
     public LymphNode() : base(BuildingType.LymphNode)
     {
@@ -19,6 +21,7 @@ public class LymphNode : EnemyBuilding
         _maxPatrolGroups = settings.maxImmunoPatroleGroups;
         _minPatrolSize = settings.minPatroleSize;
         _immunoUnitsToSpawnLymphNode = settings.immunoUnitsToSpawnLymphNode;
+        _alertDuration = settings.lymphNodeAlertDuration;
     }
 
     protected override void OnUpdate()
@@ -57,6 +60,12 @@ public class LymphNode : EnemyBuilding
 
     private void CheckRallyPointSpawn()
     {
+        if (Time.time - _alertStartTime >= _alertDuration)
+        {
+            Dealert();
+            return;
+        }
+
         var rallyNode = _node.GetRallyPoint();
         if (rallyNode == null)
         {
@@ -89,6 +98,7 @@ public class LymphNode : EnemyBuilding
     public override void OnEncounterReported(BaseNode encounterNode, UnitTravelGroup reporter)
     {
         _patrolsBlocked = true;
+        _alertStartTime = Time.time;
 
         int unitsInLocalPatrols = 0;
         foreach (var tg in _currentTravelGroups)
