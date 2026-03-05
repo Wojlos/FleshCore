@@ -11,6 +11,8 @@ public abstract class BaseBuilding : MonoBehaviour
     protected int _unitProductionPerSecond = 0;
 
     protected bool _active = true;
+    protected bool _isSieged = false;
+    public bool IsSieged => _isSieged;
 
     protected BaseBuilding(BuildingType type, ConflictSide side)
     {
@@ -71,5 +73,14 @@ public abstract class BaseBuilding : MonoBehaviour
     }
 
     public virtual void OnEncounterReported(BaseNode encounterNode, UnitTravelGroup reporter) { }
+
+    public void SetSieged(bool sieged)
+    {
+        _isSieged = sieged;
+        if (sieged)
+            Disable();
+        else
+            Enable();
+    }
 
 }

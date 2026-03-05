@@ -49,11 +49,18 @@ public class EnemyManager : MonoBehaviour
         building.AssignNode(node);
 
         var hs = building.GetComponent<HealthSystem>();
-        if (hs != null)
-            hs.OnDie += (_, _) => _enemyBuildings.Remove(building);
-
         var settings = GameManager.Instance.GetGameSettings();
         var buildingSettings = settings.immunoBuildingSettings.Find(s => s.type == building.GetBuildingType());
+        
+        if (hs != null)
+        {
+            hs.OnDie += (_, _) => {
+                _enemyBuildings.Remove(building);
+                if (buildingSettings != null)
+                    _maxUnits -= buildingSettings.maxUnitsIncrease;
+            };
+        }
+
         ((EnemyBuilding)building).ApplySettings(buildingSettings);
 
         if (buildingSettings != null)

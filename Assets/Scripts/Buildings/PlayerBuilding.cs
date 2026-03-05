@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public abstract class PlayerBuilding : BaseBuilding
 {
     private List<ResourceCost> _upkeep = new List<ResourceCost>();
+    private int _maxUnitsIncrease = 0;
     private float _upkeepTimer = 0;
 
     protected PlayerBuilding(BuildingType type) : base(type, ConflictSide.Player)
@@ -21,6 +22,7 @@ public abstract class PlayerBuilding : BaseBuilding
         if (settings == null) return;
 
         SetUpkeep(settings.upkeep);
+        _maxUnitsIncrease = settings.maxUnitsIncrease;
     }
 
     protected override void OnUpdate()
@@ -36,10 +38,17 @@ public abstract class PlayerBuilding : BaseBuilding
             {
                 Disable();
             }
-            else
+            else if (!_isSieged)
             {
                 Enable();
             }
         }      
+    }
+
+    public override void Cleanup()
+    {
+        base.Cleanup();
+        ResourceManager.Instance.ChangeResourcesPerSecond(_upkeep, true);
+        ResourceManager.Instance.ChangeMaxUnits(-_maxUnitsIncrease);
     }
 }

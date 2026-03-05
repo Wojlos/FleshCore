@@ -25,6 +25,19 @@ public class GameManager : MonoBehaviour
         BuildingSelectionManager.Instance.OpenBuildingSelection();
     }
     public void RightClickedOnNode(BaseNode node){
+        if (_selectedNode != null && _selectedNode.GetBuilding() != null && _selectedNode.GetBuilding().Side == ConflictSide.Player)
+        {
+            if (_selectedNode == node)
+            {
+                _selectedNode.ClearRallyPoint();
+            }
+            else
+            {
+                _selectedNode.SetRallyPoint(node);
+            }
+            return;
+        }
+
         var movedUnits =0;
         foreach(var c in _selectedCounters)
         {

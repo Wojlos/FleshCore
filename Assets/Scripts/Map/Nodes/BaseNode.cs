@@ -53,8 +53,8 @@ public abstract class BaseNode : MonoBehaviour
     private void CheckAndRunBattle()
     {
         bool bothSidesPresent = _playerUnits > 0 && _enemyUnits > 0;
-        bool playerSiegesEnemyBuilding = _playerUnits > 0 && _enemyUnits == 0 && _building != null && _building.Side == ConflictSide.Immuno;
-        bool enemySiegesPlayerBuilding = _enemyUnits > 0 && _playerUnits == 0 && _building != null && _building.Side == ConflictSide.Player;
+        bool playerSiegesEnemyBuilding = _playerUnits > 0 && _building != null && _building.Side == ConflictSide.Immuno;
+        bool enemySiegesPlayerBuilding = _enemyUnits > 0 && _building != null && _building.Side == ConflictSide.Player;
 
         if (bothSidesPresent)
         {
@@ -62,6 +62,12 @@ public abstract class BaseNode : MonoBehaviour
             {
                 _inBattle = true;
                 _battleTimer = 0f;
+            }
+
+            if (!_sieging && _building != null)
+            {
+                _sieging = true;
+                _building.SetSieged(true);
             }
 
             _battleTimer += Time.deltaTime;
@@ -79,10 +85,10 @@ public abstract class BaseNode : MonoBehaviour
                 _inBattle = false;
             }
 
-            if (!_sieging)
+            if (!_sieging && _building != null)
             {
                 _sieging = true;
-                _building.Disable();
+                _building.SetSieged(true);
             }
 
             _battleTimer += Time.deltaTime;
@@ -104,7 +110,7 @@ public abstract class BaseNode : MonoBehaviour
             {
                 _sieging = false;
                 if (_building != null)
-                    _building.Enable();
+                    _building.SetSieged(false);
             }
 
             _battleTimer = 0f;

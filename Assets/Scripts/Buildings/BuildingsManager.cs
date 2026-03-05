@@ -45,11 +45,6 @@ public class BuildingsManager : MonoBehaviour
     public void RemoveBuilding(BaseNode node)
     {
         ResourceManager.Instance.ChangeBuiltBuildings(-1);
-
-        var building = node.GetBuilding();
-        var buildingSettings = _settings.playerBuildingSettings.Find(b => b.type == building.GetBuildingType());
-
-        ResourceManager.Instance.ChangeResourcesPerSecond(buildingSettings.upkeep, true);
         _allBuildings.Remove(node.GetBuilding());
         node.RemoveBuilding();
     }

@@ -41,5 +41,23 @@ MonoBehaviour:
   - type: 3
     unitProductionPerSecond: 5
     startHp: 30
-  maxImmunoBuildings: 0
-  maxImmunoUnits: 30
+    maxUnitsIncrease: 30
+  battleTickInterval: 0.2
+  playerBattleDamageChance: 0.05
+  enemyBattleDamageChance: 0.05
+  playerSiegeDamageChance: 0.05
+  enemySiegeDamageChance: 0.05
+  playerStepDelayMin: 0.8
+  playerStepDelayMax: 1.2
+  enemyStepDelayMin: 0.8
+  enemyStepDelayMax: 1.2
+  playerSpeedMin: 0.8
+  playerSpeedMax: 1.2
+  enemySpeedMin: 0.8
+  enemySpeedMax: 1.2
+  maxImmunoBuildings: 1
+  maxStartImmunoUnits: 30
+  maxImmunoPatroleGroups: 3
+  immunoUnitsToSpawnLymphNode: 15
+  minPatroleSize: 10
+  lymphNodeAlertDuration: 30
