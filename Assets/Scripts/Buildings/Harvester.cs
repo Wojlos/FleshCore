@@ -9,7 +9,10 @@ public class Harvester : PlayerBuilding
     }
     private Dictionary<ResourceType, int> _resourceProduction =  new Dictionary<ResourceType, int>();
     private float _productionTimer;
-    private void Awake() {
+
+    protected override void Awake()
+    {
+        base.Awake();
         _resourceProduction[ResourceType.Blood] = 1;
         _resourceProduction[ResourceType.Lipids] = 1;
         _resourceProduction[ResourceType.Bone] = 1;

@@ -15,8 +15,9 @@ public class LymphNode : EnemyBuilding
     {
     }
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         var settings = GameManager.Instance.GetGameSettings();
         _maxPatrolGroups = settings.maxImmunoPatroleGroups;
         _minPatrolSize = settings.minPatroleSize;

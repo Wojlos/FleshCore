@@ -7,7 +7,9 @@ public class BloodPump : PlayerBuilding
     {
         
     }
-    private void Awake() {
+    protected override void Awake()
+    {
+        base.Awake();
         var settings = GameManager.Instance.GetGameSettings();
         maxBuildingIncrease = settings.pumpMaxBuildingIncrease;
         ResourceManager.Instance.ChangeMaxBuildings(maxBuildingIncrease);

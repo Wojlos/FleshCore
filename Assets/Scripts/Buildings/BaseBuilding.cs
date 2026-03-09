@@ -13,12 +13,53 @@ public abstract class BaseBuilding : MonoBehaviour
     protected bool _active = true;
     protected bool _isSieged = false;
     public bool IsSieged => _isSieged;
+    
+    private float _healingTimer = 0f;
+
+    private Material _material;
+    private SpriteRenderer _spriteRenderer;
+    private HealthSystem _healthSystem;
 
     protected BaseBuilding(BuildingType type, ConflictSide side)
     {
         _type = type;
         Side = side;
     }
+
+    protected virtual void Awake()
+    {
+        _healthSystem = GetComponent<HealthSystem>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _material = _spriteRenderer.material;    
+
+        UpdateMaterialHealthValues();
+
+        if (_healthSystem != null)
+        {
+            _healthSystem.OnHealthChanged += OnHealthChanged;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_healthSystem != null)
+        {
+            _healthSystem.OnHealthChanged -= OnHealthChanged;
+        }
+    }
+
+    private void OnHealthChanged(object sender, System.EventArgs e)
+    {
+        UpdateMaterialHealthValues();
+    }
+
+    private void UpdateMaterialHealthValues()
+    {
+        if (_spriteRenderer == null || _healthSystem == null) return;
+        _material.SetFloat("_CurrentHp", _healthSystem.CurrentHealth);
+        _material.SetFloat("_MaxHp", _healthSystem.MaxHealth);
+    }
+
     public void AssignNode(BaseNode node)
     {
         _node = node;
@@ -37,7 +78,31 @@ public abstract class BaseBuilding : MonoBehaviour
 
     protected virtual void OnUpdate()
     {
+        if (!_isSieged && _healthSystem != null)
+        {
+            _healingTimer += Time.deltaTime;
+            
+            if (_healingTimer >= 1f)
+            {
+                _healingTimer = 0f;
+                
+                float healingSpeed = GetHealingSpeed();
+                if (healingSpeed > 0f && _healthSystem.CurrentHealth < _healthSystem.MaxHealth)
+                {
+                    _healthSystem.Heal(healingSpeed);
+                }
+            }
+        }
+    }
+    
+    private float GetHealingSpeed()
+    {
+        var gameSettings = GameManager.Instance?.GetGameSettings();
+        if (gameSettings == null) return 0f;
         
+        return Side == ConflictSide.Player 
+            ? gameSettings.playerBuildingHealingSpeed 
+            : gameSettings.immunoBuildingHealingSpeed;
     }
 
     public virtual void ApplySettings(BuildingSettings settings)

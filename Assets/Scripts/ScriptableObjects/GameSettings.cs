@@ -60,6 +60,13 @@ public class GameSettings : ScriptableObject
     
     [Tooltip("Configuration for all enemy buildings")]
     public List<ImmunoBuildingSettings> immunoBuildingSettings = new List<ImmunoBuildingSettings>();
+    
+    [Space(5)]
+    [Tooltip("How many HP per second player buildings regenerate when not sieged")]
+    public float playerBuildingHealingSpeed = 1f;
+    
+    [Tooltip("How many HP per second enemy buildings regenerate when not sieged")]
+    public float immunoBuildingHealingSpeed = 0.5f;
 
     // ═══════════════════════════════════════════════════════════════════════
     // COMBAT SETTINGS
