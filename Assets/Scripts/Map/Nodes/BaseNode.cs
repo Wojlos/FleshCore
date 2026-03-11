@@ -12,6 +12,16 @@ public abstract class BaseNode : MonoBehaviour
     private List<SplineContainer> _splineContainers = new List<SplineContainer>();
     private BaseBuilding _building;
 
+    private ConflictSide _owner;
+    private HealthSystem _nodeHealthSystem;
+    private SpriteRenderer _spriteRenderer;
+    private bool _conquering = false;
+    private float _conquestTimer = 0f;
+    private float _nodeConquestTickInterval;
+    private float _playerConquestDamageChance;
+    private float _immunoConquestDamageChance;
+    private int _maxNodeHP;
+
 
     private int _playerUnits = 0;
     private int _enemyUnits = 0;
@@ -40,6 +50,19 @@ public abstract class BaseNode : MonoBehaviour
         _enemyBattleDamageChance = settings.enemyBattleDamageChance;
         _playerSiegeDamageChance = settings.playerSiegeDamageChance;
         _enemySiegeDamageChance = settings.enemySiegeDamageChance;
+        _nodeConquestTickInterval = settings.nodeConquestTickInterval;
+        _playerConquestDamageChance = settings.playerConquestDamageChance;
+        _immunoConquestDamageChance = settings.immunoConquestDamageChance;
+        _maxNodeHP = settings.maxNodeHP;
+
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _nodeHealthSystem = gameObject.AddComponent<HealthSystem>();
+        _nodeHealthSystem.MaxHealth = _maxNodeHP;
+        _nodeHealthSystem.HealToFull();
+        _nodeHealthSystem.OnDie += OnNodeOwnershipChanged;
+
+        _owner = ConflictSide.Immuno;
+        UpdateNodeColor();
 
         UpdateCounters();
         HideCounters();
@@ -56,6 +79,7 @@ public abstract class BaseNode : MonoBehaviour
         bool playerSiegesEnemyBuilding = _playerUnits > 0 && _building != null && _building.Side == ConflictSide.Immuno;
         bool enemySiegesPlayerBuilding = _enemyUnits > 0 && _building != null && _building.Side == ConflictSide.Player;
 
+        // Phase 1: Unit vs Unit combat
         if (bothSidesPresent)
         {
             if (!_inBattle)
@@ -70,6 +94,12 @@ public abstract class BaseNode : MonoBehaviour
                 _building.SetSieged(true);
             }
 
+            if (_conquering)
+            {
+                _conquering = false;
+                _conquestTimer = 0f;
+            }
+
             _battleTimer += Time.deltaTime;
             if (_battleTimer >= _battleTickInterval)
             {
@@ -77,6 +107,7 @@ public abstract class BaseNode : MonoBehaviour
                 ProcessBattleTick();
             }
         }
+        // Phase 2: Unit vs Building siege
         else if (playerSiegesEnemyBuilding || enemySiegesPlayerBuilding)
         {
             if (_inBattle)
@@ -91,6 +122,12 @@ public abstract class BaseNode : MonoBehaviour
                 _building.SetSieged(true);
             }
 
+            if (_conquering)
+            {
+                _conquering = false;
+                _conquestTimer = 0f;
+            }
+
             _battleTimer += Time.deltaTime;
             if (_battleTimer >= _battleTickInterval)
             {
@@ -98,6 +135,7 @@ public abstract class BaseNode : MonoBehaviour
                 ProcessSiegeTick();
             }
         }
+        // Phase 3: Node conquest
         else
         {
             if (_inBattle)
@@ -114,6 +152,34 @@ public abstract class BaseNode : MonoBehaviour
             }
 
             _battleTimer = 0f;
+
+            // Check if node should be conquered
+            bool playerConquersNode = _playerUnits > 0 && _owner == ConflictSide.Immuno;
+            bool immunoConquersNode = _enemyUnits > 0 && _owner == ConflictSide.Player;
+
+            if (playerConquersNode || immunoConquersNode)
+            {
+                if (!_conquering)
+                {
+                    _conquering = true;
+                    _conquestTimer = 0f;
+                }
+
+                _conquestTimer += Time.deltaTime;
+                if (_conquestTimer >= _nodeConquestTickInterval)
+                {
+                    _conquestTimer = 0f;
+                    ProcessConquestTick();
+                }
+            }
+            else
+            {
+                if (_conquering)
+                {
+                    _conquering = false;
+                    _conquestTimer = 0f;
+                }
+            }
         }
     }
 
@@ -163,6 +229,23 @@ public abstract class BaseNode : MonoBehaviour
         }
         if (hits > 0)
             _building.GetComponent<HealthSystem>().ApplyDamage(hits);
+    }
+
+    private void ProcessConquestTick()
+    {
+        bool playerConquering = _playerUnits > 0 && _owner == ConflictSide.Immuno;
+        int attackerCount = playerConquering ? _playerUnits : _enemyUnits;
+        float damageChance = playerConquering ? _playerConquestDamageChance : _immunoConquestDamageChance;
+        
+        int hits = 0;
+        for (int i = 0; i < attackerCount; i++)
+        {
+            if (Random.value <= damageChance)
+                hits++;
+        }
+        
+        if (hits > 0)
+            _nodeHealthSystem.ApplyDamage(hits);
     }
     
     public bool IsInBattle() => _inBattle;
@@ -354,6 +437,23 @@ public abstract class BaseNode : MonoBehaviour
         b.Cleanup();
         Destroy(b.gameObject);
         
+    }
+
+    private void OnNodeOwnershipChanged(object sender, System.EventArgs e)
+    {
+        ConflictSide newOwner = _owner == ConflictSide.Player ? ConflictSide.Immuno : ConflictSide.Player;
+        _owner = newOwner;
+        
+        _nodeHealthSystem.HealToFull();
+        UpdateNodeColor();
+    }
+
+    private void UpdateNodeColor()
+    {
+        if (_spriteRenderer == null) return;
+        
+        var settings = GameManager.Instance.GetGameSettings();
+        _spriteRenderer.color = _owner == ConflictSide.Player ? settings.playerNodeColor : settings.immunoNodeColor;
     }
 
 }

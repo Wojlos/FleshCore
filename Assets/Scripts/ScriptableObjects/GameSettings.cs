@@ -144,4 +144,29 @@ public class GameSettings : ScriptableObject
     
     [Tooltip("Duration of lymph node alert phase before returning to normal (seconds)")]
     public float lymphNodeAlertDuration = 30f;
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // NODE OWNERSHIP SETTINGS
+    // ═══════════════════════════════════════════════════════════════════════
+    [Header("Node Ownership Settings")]
+    
+    [Tooltip("Maximum health points for node ownership system")]
+    public int maxNodeHP = 30;
+    
+    [Space(5)]
+    [Tooltip("Color for Immuno-owned nodes")]
+    public Color immunoNodeColor = Color.white;
+    
+    [Tooltip("Color for Player-owned nodes")]
+    public Color playerNodeColor = new Color(0.68f, 0.85f, 0.90f); // Light blue
+    
+    [Space(5)]
+    [Tooltip("Probability per player unit to deal 1 damage to node ownership per tick (0.0 - 1.0)")]
+    public float playerConquestDamageChance = 0.1f;
+    
+    [Tooltip("Probability per immuno unit to deal 1 damage to node ownership per tick (0.0 - 1.0)")]
+    public float immunoConquestDamageChance = 0.1f;
+    
+    [Tooltip("Time interval between conquest damage calculations (seconds)")]
+    public float nodeConquestTickInterval = 0.5f;
 }
