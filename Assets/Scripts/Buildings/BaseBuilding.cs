@@ -66,6 +66,8 @@ public abstract class BaseBuilding : MonoBehaviour
         _node.AssignBuilding(this);
     }
 
+    public BaseNode GetNode() => _node;
+
     public virtual void Cleanup()
     {
         

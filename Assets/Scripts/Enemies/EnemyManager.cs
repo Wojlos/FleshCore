@@ -71,12 +71,41 @@ public class EnemyManager : MonoBehaviour
     {
         var allNodes = MapManager.Instance.GetAllNodes();
         if (allNodes.Count == 0) return null;
+        
+        var settings = GameManager.Instance.GetGameSettings();
+        int minDistance = settings.minLymphNodeDistanceFromPlayer;
+        var playerBuildings = BuildingsManager.Instance.GetAllBuildings();
+        
         int attempts = 0;
         while (attempts < allNodes.Count * 2)
         {
             var tempSpot = allNodes[Random.Range(0, allNodes.Count)];
-            if (tempSpot.GetBuilding() == null)
+            
+            if (tempSpot.GetBuilding() != null)
+            {
+                attempts++;
+                continue;
+            }
+            
+            bool tooCloseToPlayer = false;
+            foreach (var building in playerBuildings)
+            {
+                if (building == null || building.Side != ConflictSide.Player) continue;
+                
+                var buildingNode = building.GetComponent<BaseBuilding>().GetNode();
+                if (buildingNode == null) continue;
+                
+                int distance = PathfindingManager.Instance.GetGraphDistance(tempSpot, buildingNode);
+                if (distance < minDistance)
+                {
+                    tooCloseToPlayer = true;
+                    break;
+                }
+            }
+            
+            if (!tooCloseToPlayer)
                 return tempSpot;
+                
             attempts++;
         }
         return null;

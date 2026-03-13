@@ -46,6 +46,13 @@ public class GameSettings : ScriptableObject
     
     [Tooltip("Resources the player starts with")]
     public List<ResourceCost> startingResources = new List<ResourceCost>();
+    
+    [Space(5)]
+    [Tooltip("Number of units to spawn at game start on the player's starting node")]
+    public int startingPlayerUnits = 20;
+    
+    [Tooltip("Minimum graph distance (node hops) lymph nodes must spawn from any player building")]
+    public int minLymphNodeDistanceFromPlayer = 2;
 
     // ═══════════════════════════════════════════════════════════════════════
     // BUILDING SETTINGS

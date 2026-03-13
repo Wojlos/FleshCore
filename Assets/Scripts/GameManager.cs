@@ -19,6 +19,11 @@ public class GameManager : MonoBehaviour
         MapGenerator.Instance.GenerateMap();
     }
 
+    private void Start()
+    {
+        InitializePlayerStart();
+    }
+
     public void ClickedOnNode(BaseNode node){
         DeselectCounters();
         SelectNode(node);
@@ -112,9 +117,62 @@ public class GameManager : MonoBehaviour
     }
 
     public GameSettings GetGameSettings() => _gameSettings;
+    public BaseNode GetSelectedNode() => _selectedNode;
     public bool IsNodeEmpty()
     {
         return _selectedNode != null && _selectedNode.GetBuilding() == null;
+    }
+
+    private void InitializePlayerStart()
+    {
+        var allNodes = MapManager.Instance.GetAllNodes();
+        if (allNodes == null || allNodes.Count == 0)
+        {
+            Debug.LogError("GameManager: No nodes available for player start initialization.");
+            return;
+        }
+
+        BaseNode startNode = allNodes[Random.Range(0, allNodes.Count)];
+        if (startNode == null)
+        {
+            Debug.LogError("GameManager: Selected start node is null.");
+            return;
+        }
+
+        startNode.SetOwnerDirectly(ConflictSide.Player);
+
+        var settings = _gameSettings;
+        var pumpSettings = settings.playerBuildingSettings.Find(b => b.type == BuildingType.BloodPump);
+        if (pumpSettings == null)
+        {
+            Debug.LogError("GameManager: BloodPump settings not found in GameSettings.");
+            return;
+        }
+
+        GameObject pumpPrefab = BuildingSelectionManager.Instance.GetBuildingPrefab(BuildingType.BloodPump);
+        if (pumpPrefab == null)
+        {
+            Debug.LogError("GameManager: BloodPump prefab not found.");
+            return;
+        }
+
+        BuildingsManager.Instance.BuildBuilding(pumpPrefab, startNode);
+
+        int unitsToSpawn = settings.startingPlayerUnits;
+        startNode.CreateUnits(unitsToSpawn, true);
+
+        CenterCameraOnNode(startNode);
+    }
+
+    private void CenterCameraOnNode(BaseNode node)
+    {
+        if (node == null) return;
+
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null) return;
+
+        Vector3 nodePosition = node.transform.position;
+        mainCamera.transform.position = new Vector3(nodePosition.x, nodePosition.y, mainCamera.transform.position.z);
     }
 
 }

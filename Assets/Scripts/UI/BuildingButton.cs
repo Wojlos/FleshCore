@@ -21,17 +21,27 @@ public class BuildingButton : MonoBehaviour
 
     public void SetupBuilding(BuildingSettings settings)
     {
+        if (_button == null)
+            _button = GetComponent<Button>();
+
+        if (_iconImage == null)
+            _iconImage = GetComponent<Image>();
+
         _buildingType = settings.type;
 
         if (_iconImage != null)
             _iconImage.sprite = settings.sprite;
 
-        _button.onClick.RemoveAllListeners();
-
-        _button.onClick.AddListener(() =>
+        if (_button != null)
         {
-            BuildingSelectionManager.Instance.SelectBuilding(_buildingType.ToString());
-        });
+            _button.onClick.RemoveAllListeners();
+
+            _button.onClick.AddListener(() =>
+            {
+                BuildingSelectionManager.Instance.SelectBuilding(_buildingType.ToString());
+            });
+        }
+
         _buildCost = settings.buildCost;
         _upkeep = settings.upkeep;
 

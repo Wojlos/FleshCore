@@ -70,6 +70,12 @@ public class BuildingSelectionManager : MonoBehaviour
     
     public void OpenBuildingSelection()
     {
+        var selectedNode = GameManager.Instance.GetSelectedNode();
+        if (selectedNode == null || selectedNode.GetOwner() != ConflictSide.Player)
+        {
+            return;
+        }
+
         _buildingSelectionPopup.SetActive(true);
         if(GameManager.Instance.IsNodeEmpty()){
             _removeButton.interactable = false;
@@ -146,6 +152,21 @@ public class BuildingSelectionManager : MonoBehaviour
         }
 
         
+    }
+
+    public GameObject GetBuildingPrefab(BuildingType type)
+    {
+        switch (type)
+        {
+            case BuildingType.BloodPump:
+                return _bloodPumpPrefab;
+            case BuildingType.Harvester:
+                return _harvesterPrefab;
+            case BuildingType.DefenceOutpost:
+                return _defenceOutpostPrefab;
+            default:
+                return null;
+        }
     }
 
 }

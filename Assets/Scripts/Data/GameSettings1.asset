@@ -21,6 +21,8 @@ MonoBehaviour:
     cost: 4
   - type: 2
     cost: 4
+  startingPlayerUnits: 20
+  minLymphNodeDistanceFromPlayer: 2
   pumpMaxBuildingIncrease: 3
   playerBuildingSettings:
   - type: 0
@@ -42,6 +44,8 @@ MonoBehaviour:
     unitProductionPerSecond: 5
     startHp: 30
     maxUnitsIncrease: 30
+  playerBuildingHealingSpeed: 1
+  immunoBuildingHealingSpeed: 0.5
   battleTickInterval: 0.2
   playerBattleDamageChance: 0.05
   enemyBattleDamageChance: 0.05
@@ -57,7 +61,13 @@ MonoBehaviour:
   enemySpeedMax: 1.2
   maxImmunoBuildings: 1
   maxStartImmunoUnits: 30
-  maxImmunoPatroleGroups: 3
+  maxImmunoPatroleGroups: 1
   immunoUnitsToSpawnLymphNode: 15
   minPatroleSize: 10
   lymphNodeAlertDuration: 30
+  maxNodeHP: 30
+  immunoNodeColor: {r: 0.9622642, g: 0.918963, b: 0.695372, a: 1}
+  playerNodeColor: {r: 0.47335705, g: 0.83328134, b: 0.93962264, a: 1}
+  playerConquestDamageChance: 0.1
+  immunoConquestDamageChance: 0.1
+  nodeConquestTickInterval: 0.5

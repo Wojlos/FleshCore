@@ -134,4 +134,13 @@ public class PathfindingManager : MonoBehaviour
 
         return path;
     }
+
+    public int GetGraphDistance(BaseNode from, BaseNode to)
+    {
+        if (from == null || to == null) return int.MaxValue;
+        if (from == to) return 0;
+
+        var path = GetPath(from, to);
+        return path.Count > 0 ? path.Count - 1 : int.MaxValue;
+    }
 }

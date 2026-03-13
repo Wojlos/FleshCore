@@ -250,6 +250,7 @@ public abstract class BaseNode : MonoBehaviour
     
     public bool IsInBattle() => _inBattle;
     public int GetEnemyUnits() => _enemyUnits;
+    public ConflictSide GetOwner() => _owner;
     public List<UnitTravelGroup> GetTravelGroups() => _attachedPlayerTravelGroups;
     public void AddPlayerTravelGroup(UnitTravelGroup tg)
     {
@@ -454,6 +455,14 @@ public abstract class BaseNode : MonoBehaviour
         
         var settings = GameManager.Instance.GetGameSettings();
         _spriteRenderer.color = _owner == ConflictSide.Player ? settings.playerNodeColor : settings.immunoNodeColor;
+    }
+
+    public void SetOwnerDirectly(ConflictSide newOwner)
+    {
+        _owner = newOwner;
+        if (_nodeHealthSystem != null)
+            _nodeHealthSystem.HealToFull();
+        UpdateNodeColor();
     }
 
 }
