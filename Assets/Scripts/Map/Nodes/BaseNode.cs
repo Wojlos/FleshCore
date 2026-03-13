@@ -303,9 +303,13 @@ public abstract class BaseNode : MonoBehaviour
         return tg;
     }
 
-    public void SendUnits(int units, BaseNode destination)
+    public void SendUnits(int units, BaseNode destination, bool cancelExistingTravelGroups = true)
     {
-        CancelPlayerTravelGroups();
+        if (cancelExistingTravelGroups)
+        {
+            CancelPlayerTravelGroups();
+        }
+        
         GameObject go = Instantiate(
             _unitTravelGroupPrefab,
             destination.transform.position,

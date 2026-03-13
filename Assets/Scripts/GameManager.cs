@@ -43,14 +43,18 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        var movedUnits =0;
         foreach(var c in _selectedCounters)
         {
             var n = c.GetConnectedNode();
-            var unitsMoved = n.GetAllPlayerUnits();
-            n.SendUnits(unitsMoved, node);
-        }        
-        // node.ChangeUnitCount(movedUnits, true);
+            var unitsMoved = c.GetSelectedUnits();
+            var totalUnits = c.GetTotalUnits();
+            
+            if (unitsMoved > 0)
+            {
+                bool isFullSelection = (unitsMoved == totalUnits);
+                n.SendUnits(unitsMoved, node, cancelExistingTravelGroups: isFullSelection);
+            }
+        }
         DeselectCounters();
 
     }
@@ -64,16 +68,23 @@ public class GameManager : MonoBehaviour
     {
         DeselectCounters();
 
-        var nodes = MapManager.Instance.GetAllNodesInArea(area);
+        var nodesWithCoverage = MapManager.Instance.GetAllNodesInAreaWithCoverage(area);
 
-        foreach(var n in nodes)
+        foreach(var data in nodesWithCoverage)
         {
-            var counter = n.GetPlayerUnitCounter();
-            if (counter){
-                _selectedCounters.Add(counter);
-                counter.SelectUnits();    
+            var counter = data.node.GetPlayerUnitCounter();
+            if (counter)
+            {
+                int totalUnits = data.node.GetAllPlayerUnits();
+                int selectedUnits = Mathf.CeilToInt(totalUnits * data.coveragePercentage);
+                selectedUnits = Mathf.Clamp(selectedUnits, 0, totalUnits);
+
+                if (selectedUnits > 0)
+                {
+                    _selectedCounters.Add(counter);
+                    counter.SelectPartialUnits(selectedUnits, totalUnits);
+                }
             }
-            
         }
     }
     private void DeselectCounters()

@@ -153,6 +153,19 @@ public class GameSettings : ScriptableObject
     public float lymphNodeAlertDuration = 30f;
 
     // ═══════════════════════════════════════════════════════════════════════
+    // SELECTION SETTINGS
+    // ═══════════════════════════════════════════════════════════════════════
+    [Header("Selection Settings")]
+    
+    [Tooltip("Minimum coverage percentage required to select units from a node (0.0 - 1.0, default 0 = any coverage)")]
+    [Range(0f, 1f)]
+    public float minSelectionCoverageThreshold = 0f;
+    
+    [Tooltip("Number of sample points per unit radius for coverage calculation (higher = more accurate but slower)")]
+    [Range(3, 20)]
+    public int selectionSamplePointsPerRadius = 8;
+
+    // ═══════════════════════════════════════════════════════════════════════
     // NODE OWNERSHIP SETTINGS
     // ═══════════════════════════════════════════════════════════════════════
     [Header("Node Ownership Settings")]

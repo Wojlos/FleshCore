@@ -2,6 +2,18 @@ using UnityEngine;
 using UnityEngine.Splines;
 using System.Collections.Generic;
 
+public struct NodeSelectionData
+{
+    public BaseNode node;
+    public float coveragePercentage;
+
+    public NodeSelectionData(BaseNode node, float coverage)
+    {
+        this.node = node;
+        this.coveragePercentage = coverage;
+    }
+}
+
 public class MapManager : MonoBehaviour
 {
     public static MapManager Instance;
@@ -97,23 +109,84 @@ public class MapManager : MonoBehaviour
 
     public List<BaseNode> GetAllNodesInArea(Rect area)
     {
+        var selectionData = GetAllNodesInAreaWithCoverage(area);
         var result = new List<BaseNode>();
+        foreach (var data in selectionData)
+        {
+            result.Add(data.node);
+        }
+        return result;
+    }
+
+    public List<NodeSelectionData> GetAllNodesInAreaWithCoverage(Rect screenArea)
+    {
+        var result = new List<NodeSelectionData>();
         if (_mapNodes == null || _mapNodes.Count == 0) return result;
 
         Camera cam = Camera.main;
         if (cam == null) return result;
 
+        var settings = GameManager.Instance.GetGameSettings();
+        float minThreshold = settings.minSelectionCoverageThreshold;
+        int samplesPerRadius = settings.selectionSamplePointsPerRadius;
+
         foreach (var node in _mapNodes)
         {
             if (node == null) continue;
 
-            Vector3 screenPos = cam.WorldToScreenPoint(node.transform.position);
-            if (screenPos.z < 0f) continue;
+            var collider = node.GetComponent<CircleCollider2D>();
+            if (collider == null) continue;
 
-            if (area.Contains(new Vector2(screenPos.x, screenPos.y)))
-                result.Add(node);
+            float coverage = CalculateCircleColliderCoverage(node, collider, screenArea, cam, samplesPerRadius);
+            
+            if (coverage >= minThreshold)
+            {
+                result.Add(new NodeSelectionData(node, coverage));
+            }
         }
 
         return result;
+    }
+
+    private float CalculateCircleColliderCoverage(BaseNode node, CircleCollider2D collider, Rect screenArea, Camera cam, int samplesPerRadius)
+    {
+        Vector3 worldCenter = node.transform.position + (Vector3)collider.offset;
+        float worldRadius = collider.radius * Mathf.Max(node.transform.lossyScale.x, node.transform.lossyScale.y);
+
+        int gridSize = samplesPerRadius * 2;
+        int totalPoints = 0;
+        int pointsInSelection = 0;
+
+        for (int x = 0; x < gridSize; x++)
+        {
+            for (int y = 0; y < gridSize; y++)
+            {
+                float normalizedX = (x / (float)(gridSize - 1)) * 2f - 1f;
+                float normalizedY = (y / (float)(gridSize - 1)) * 2f - 1f;
+
+                if (normalizedX * normalizedX + normalizedY * normalizedY > 1f)
+                    continue;
+
+                Vector3 samplePoint = worldCenter + new Vector3(
+                    normalizedX * worldRadius,
+                    normalizedY * worldRadius,
+                    0f
+                );
+
+                Vector3 screenPos = cam.WorldToScreenPoint(samplePoint);
+                
+                if (screenPos.z < 0f) continue;
+
+                totalPoints++;
+
+                if (screenArea.Contains(new Vector2(screenPos.x, screenPos.y)))
+                {
+                    pointsInSelection++;
+                }
+            }
+        }
+
+        if (totalPoints == 0) return 0f;
+        return pointsInSelection / (float)totalPoints;
     }
 }
