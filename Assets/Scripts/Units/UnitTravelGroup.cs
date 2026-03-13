@@ -229,6 +229,17 @@ public class UnitTravelGroup : MonoBehaviour
             return;
         }
 
+        if (!_fleeingEncounter && HasOpposingNodeOwnership())
+        {
+            if (_mode == UnitMode.Patrol && _side == ConflictSide.Immuno && _currentNode != _originNode)
+            {
+                _encounterNode = _currentNode;
+                _fleeingEncounter = true;
+                SwitchToDirectedRecall();
+                return;
+            }
+        }
+
         if (_mode == UnitMode.Patrol && IsOriginUnderAttack())
         {
             SwitchToDirectedRecall();
@@ -479,6 +490,12 @@ public class UnitTravelGroup : MonoBehaviour
     private bool IsOriginBuildingDestroyed()
     {
         return _tracksOriginBuilding && _originBuilding == null;
+    }
+
+    private bool HasOpposingNodeOwnership()
+    {
+        if (_currentNode == null) return false;
+        return _currentNode.GetOwner() != _side;
     }
 
     // ──────────────────────────────────────────────
