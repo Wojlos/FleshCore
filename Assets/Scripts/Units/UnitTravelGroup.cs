@@ -34,6 +34,9 @@ public class UnitTravelGroup : MonoBehaviour
     private UnitState _state;
     private UnitMode _mode;
     private ConflictSide _side;
+    
+    private MaterialPropertyBlock _materialPropertyBlock;
+    private MeshRenderer _sphereRenderer;
 
     private float _waitTimer;
     private float _stepDelay;
@@ -56,6 +59,11 @@ public class UnitTravelGroup : MonoBehaviour
         _splineAnimator = GetComponent<SplineAnimate>();
         if (_splineAnimator == null)
             Debug.LogError($"{name}: Missing SplineAnimate component.");
+        
+        _materialPropertyBlock = new MaterialPropertyBlock();
+        
+        if (_visualisation != null)
+            _sphereRenderer = _visualisation.GetComponent<MeshRenderer>();
     }
 
     private void Update()
@@ -157,11 +165,13 @@ public class UnitTravelGroup : MonoBehaviour
         {
             _stepDelay = Random.Range(settings.playerStepDelayMin, settings.playerStepDelayMax);
             _movementSpeed = Random.Range(settings.playerSpeedMin, settings.playerSpeedMax);
+            SetSphereColor(settings.playerUnitGroupColor);
         }
         else
         {
             _stepDelay = Random.Range(settings.enemyStepDelayMin, settings.enemyStepDelayMax);
             _movementSpeed = Random.Range(settings.enemySpeedMin, settings.enemySpeedMax);
+            SetSphereColor(settings.immunoUnitGroupColor);
         }
 
         var building = start.GetBuilding();
@@ -501,6 +511,16 @@ public class UnitTravelGroup : MonoBehaviour
     // ──────────────────────────────────────────────
     // Helpers
     // ──────────────────────────────────────────────
+
+    private void SetSphereColor(Color color)
+    {
+        if (_sphereRenderer == null || _materialPropertyBlock == null)
+            return;
+
+        _materialPropertyBlock.SetColor("_FaceColor", color);
+        _materialPropertyBlock.SetColor("_Color", color);
+        _sphereRenderer.SetPropertyBlock(_materialPropertyBlock);
+    }
 
     private BaseNode DequeueNextNode()
     {

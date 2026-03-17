@@ -131,6 +131,13 @@ public class GameSettings : ScriptableObject
     
     [Tooltip("Maximum movement speed for enemy units (animation speed multiplier)")]
     public float enemySpeedMax = 1.2f;
+    
+    [Space(5)]
+    [Tooltip("Color for player unit travel groups")]
+    public Color playerUnitGroupColor = new Color(0f, 0f, 0.5f); // Dark blue
+    
+    [Tooltip("Color for immuno unit travel groups")]
+    public Color immunoUnitGroupColor = new Color(0.5f, 0.5f, 0f); // Dark yellow
 
     // ═══════════════════════════════════════════════════════════════════════
     // ENEMY AI SETTINGS
