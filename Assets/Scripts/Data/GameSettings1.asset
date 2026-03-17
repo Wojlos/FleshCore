@@ -27,15 +27,46 @@ MonoBehaviour:
   playerBuildingSettings:
   - type: 0
     sprite: {fileID: 1569033066621811975, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
+    description: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
     buildCost: []
     upkeep: []
+    production: []
     maxUnitsIncrease: 5
     unitProductionPerSecond: 0
     startHp: 30
   - type: 2
     sprite: {fileID: 57806773, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
+    description: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
     buildCost: []
     upkeep: []
+    production: []
+    maxUnitsIncrease: 30
+    unitProductionPerSecond: 5
+    startHp: 30
+  - type: 1
+    sprite: {fileID: -1231628468, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
+    description: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    buildCost:
+    - type: 0
+      cost: 1
+    - type: 1
+      cost: 1
+    - type: 2
+      cost: 1
+    upkeep:
+    - type: 0
+      cost: 1
+    - type: 1
+      cost: 1
+    - type: 2
+      cost: 1
+    production:
+    - type: 0
+      cost: 2
+    - type: 1
+      cost: 2
+    - type: 2
+      cost: 2
     maxUnitsIncrease: 30
     unitProductionPerSecond: 5
     startHp: 30
@@ -65,6 +96,9 @@ MonoBehaviour:
   immunoUnitsToSpawnLymphNode: 15
   minPatroleSize: 10
   lymphNodeAlertDuration: 30
+  tooltipHoverDelay: 0.1
+  minSelectionCoverageThreshold: 0
+  selectionSamplePointsPerRadius: 8
   maxNodeHP: 30
   immunoNodeColor: {r: 0.9622642, g: 0.918963, b: 0.695372, a: 1}
   playerNodeColor: {r: 0.47335705, g: 0.83328134, b: 0.93962264, a: 1}

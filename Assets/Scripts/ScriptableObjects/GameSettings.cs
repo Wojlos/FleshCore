@@ -13,8 +13,11 @@ public class BuildingSettings
 {
     public BuildingType type;
     public Sprite sprite;
+    [TextArea(2, 5)]
+    public string description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
     public List<ResourceCost> buildCost = new List<ResourceCost>();
     public List<ResourceCost> upkeep = new List<ResourceCost>();
+    public List<ResourceCost> production = new List<ResourceCost>();
     public int maxUnitsIncrease = 1;
     public int unitProductionPerSecond = 0;
     public int startHp = 30;
@@ -155,6 +158,11 @@ public class GameSettings : ScriptableObject
     // ═══════════════════════════════════════════════════════════════════════
     // SELECTION SETTINGS
     // ═══════════════════════════════════════════════════════════════════════
+    [Header("UI Settings")]
+    
+    [Tooltip("Delay before showing building tooltip on hover (seconds)")]
+    public float tooltipHoverDelay = 0.1f;
+
     [Header("Selection Settings")]
     
     [Tooltip("Minimum coverage percentage required to select units from a node (0.0 - 1.0, default 0 = any coverage)")]

@@ -26,8 +26,12 @@ public class BuildingSelectionManager : MonoBehaviour
     [SerializeField] private GameObject _harvesterPrefab;
     [SerializeField] private GameObject _defenceOutpostPrefab;
 
+    [Header("Tooltip")]
+    [SerializeField] private GameObject _tooltipPrefab;
+
     private GameSettings _settings;
     private List<BuildingButton> _buildingButtons = new List<BuildingButton>();
+    private BuildingSelectionTooltip _tooltip;
     private void Awake()
     {
         if (Instance)
@@ -38,8 +42,16 @@ public class BuildingSelectionManager : MonoBehaviour
         Instance = this;
 
         _settings = GameManager.Instance.GetGameSettings();
+        InstantiateTooltip();
         PopulateButtons();
 
+    }
+
+    private void InstantiateTooltip()
+    {
+        if (_tooltipPrefab == null) return;
+        GameObject go = Instantiate(_tooltipPrefab, _buildingSelectionPopup.transform.parent);
+        _tooltip = go.GetComponent<BuildingSelectionTooltip>();
     }
     public void SelectBuilding(string buildingType)
     {
@@ -88,6 +100,9 @@ public class BuildingSelectionManager : MonoBehaviour
 
     public void CloseBuildingSelection()
     {
+        if (_tooltip != null)
+            _tooltip.Hide();
+
         foreach(var b in _buildingButtons)
         {
             b.Enable();
@@ -110,6 +125,7 @@ public class BuildingSelectionManager : MonoBehaviour
             );
             var buildingButton = go.GetComponent<BuildingButton>();
             buildingButton.SetupBuilding(bs);
+            buildingButton.SetTooltip(_tooltip);
             _buildingButtons.Add(buildingButton);
         }
         CloseBuildingSelection();
@@ -130,6 +146,7 @@ public class BuildingSelectionManager : MonoBehaviour
             if (!GameManager.Instance.IsNodeEmpty())
             {
                 b.Disable();
+                continue;
             }
             if (isMax)
             {

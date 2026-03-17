@@ -1,16 +1,18 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class IconTextElement : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField] private Image _icon;
+    [SerializeField] private TextMeshProUGUI _text;
 
-    // Update is called once per frame
-    void Update()
+    public void Setup(Sprite icon, string text)
     {
-        
+        if (_icon != null)
+            _icon.sprite = icon;
+
+        if (_text != null)
+            _text.text = text;
     }
 }

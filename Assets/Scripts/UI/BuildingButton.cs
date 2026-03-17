@@ -1,14 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
-public class BuildingButton : MonoBehaviour
+public class BuildingButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private Image _iconImage;
     private Button _button;
     private BuildingType _buildingType;
     private List<ResourceCost> _buildCost = new List<ResourceCost>();
     private List<ResourceCost> _upkeep = new List<ResourceCost>();
+    private BuildingSettings _settings;
+    private BuildingSelectionTooltip _tooltip;
 
     private void Awake()
     {
@@ -44,13 +47,12 @@ public class BuildingButton : MonoBehaviour
 
         _buildCost = settings.buildCost;
         _upkeep = settings.upkeep;
-
+        _settings = settings;
     }
 
     public List<ResourceCost> GetCost() => _buildCost;
     public List<ResourceCost> GetUpkeep() => _upkeep;
     public BuildingType GetBuildingType() => _buildingType;
-
 
     public void Enable()
     {
@@ -60,5 +62,22 @@ public class BuildingButton : MonoBehaviour
     public void Disable()
     {
         _button.interactable = false;
+    }
+
+    public void SetTooltip(BuildingSelectionTooltip tooltip)
+    {
+        _tooltip = tooltip;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (_tooltip != null && _settings != null)
+            _tooltip.Show(_settings);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (_tooltip != null)
+            _tooltip.Hide();
     }
 }

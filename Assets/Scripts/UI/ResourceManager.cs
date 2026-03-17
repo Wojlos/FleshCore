@@ -32,6 +32,10 @@ public class ResourceManager : MonoBehaviour
 
     [Header("resources")]
     [SerializeField] private List<ResourceData> _resourceData = new List<ResourceData>();
+
+    [Header("Additional Production Icons")]
+    [SerializeField] private Sprite _unitsIcon;
+    [SerializeField] private Sprite _maxBuildingsIcon;
     
 
     private int _maxBuildings = 0;
@@ -227,5 +231,15 @@ public class ResourceManager : MonoBehaviour
         return res;
     }
 
+    public Sprite GetResourceIcon(ResourceType type)
+    {
+        foreach (var rd in _resourceData)
+        {
+            if (rd.type == type) return rd.icon;
+        }
+        return null;
+    }
 
+    public Sprite GetUnitsIcon() => _unitsIcon;
+    public Sprite GetMaxBuildingsIcon() => _maxBuildingsIcon;
 }
