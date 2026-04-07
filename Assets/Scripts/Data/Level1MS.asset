@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d22e9d22f997454e969ba93c33b4561, type: 3}
+  m_Name: Level1MS
+  m_EditorClassIdentifier: Assembly-CSharp::MapSettings
+  seed: 1
+  padding: 5
+  resources:
+  - resourceType: 0
+    density: 1
+    nodeSize: 2.5
+    drawingMode: 0
+    material: {fileID: 2100000, guid: 42cc6cb355c5fe449802491e1dafdcee, type: 2}
+    tileScale: 0.3
+    tilesPerOneResource: 40
+    isBottom: 1
+  - resourceType: 2
+    density: 8
+    nodeSize: 2
+    drawingMode: 0
+    material: {fileID: 2100000, guid: 6d50822a9511eff408edabf6ad80069e, type: 2}
+    tileScale: 0.3
+    tilesPerOneResource: 40
+    isBottom: 0
+  - resourceType: 1
+    density: 8
+    nodeSize: 2.5
+    drawingMode: 0
+    material: {fileID: 2100000, guid: 2d7a47875a390b64b81f9d9372431a0f, type: 2}
+    tileScale: 0.3
+    tilesPerOneResource: 40
+    isBottom: 0
+  nodeExclusionRadius: 1
+  splineExclusionRadius: 0.8
+  exclusionNoiseScale: 2
+  exclusionNoiseAmplitude: 0.5
+  splineSampleResolution: 0.3
+  resourceGatheringRange: 3
+  gatheringRangeVisualColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  showGatheringRangeOnHover: 1

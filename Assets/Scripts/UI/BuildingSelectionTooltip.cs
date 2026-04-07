@@ -104,11 +104,18 @@ public class BuildingSelectionTooltip : MonoBehaviour
     {
         ClearContainer(_productionContainer);
 
-        foreach (var rc in settings.production)
+        if (settings.type == BuildingType.Harvester)
         {
-            Sprite icon = ResourceManager.Instance.GetResourceIcon(rc.type);
-            var element = Instantiate(_iconTextElementPrefab, _productionContainer).GetComponent<IconTextElement>();
-            element.Setup(icon, rc.cost.ToString());
+            PopulateHarvesterProduction();
+        }
+        else
+        {
+            foreach (var rc in settings.production)
+            {
+                Sprite icon = ResourceManager.Instance.GetResourceIcon(rc.type);
+                var element = Instantiate(_iconTextElementPrefab, _productionContainer).GetComponent<IconTextElement>();
+                element.Setup(icon, rc.cost.ToString());
+            }
         }
 
         if (settings.unitProductionPerSecond > 0)
@@ -131,6 +138,22 @@ public class BuildingSelectionTooltip : MonoBehaviour
             Sprite icon = ResourceManager.Instance.GetMaxBuildingsIcon();
             var element = Instantiate(_iconTextElementPrefab, _productionContainer).GetComponent<IconTextElement>();
             element.Setup(icon, "+" + maxBuildingIncrease.ToString());
+        }
+    }
+
+    private void PopulateHarvesterProduction()
+    {
+        BaseNode selectedNode = GameManager.Instance.GetSelectedNode();
+        if (selectedNode == null) return;
+
+        var production = Harvester.CalculateProductionForNode(selectedNode);
+
+        foreach (var kvp in production)
+        {
+            Sprite icon = ResourceManager.Instance.GetResourceIcon(kvp.Key);
+            if (icon == null) continue;
+            var element = Instantiate(_iconTextElementPrefab, _productionContainer).GetComponent<IconTextElement>();
+            element.Setup(icon, kvp.Value.ToString());
         }
     }
 

@@ -103,6 +103,8 @@ public class BuildingSelectionManager : MonoBehaviour
         if (_tooltip != null)
             _tooltip.Hide();
 
+        BuildingButton.HideGatheringRange();
+
         foreach(var b in _buildingButtons)
         {
             b.Enable();

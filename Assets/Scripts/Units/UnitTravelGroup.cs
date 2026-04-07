@@ -306,6 +306,7 @@ public class UnitTravelGroup : MonoBehaviour
         {
             _splineAnimator.Container = container;
             SetSplineDirection(container, _currentNode.transform.position, _nextNode.transform.position);
+            _splineAnimator.AnimationMethod = SplineAnimate.Method.Speed;
             _splineAnimator.MaxSpeed = _movementSpeed;
             _splineAnimator.Play();
 

@@ -13,6 +13,9 @@ public class BuildingButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private BuildingSettings _settings;
     private BuildingSelectionTooltip _tooltip;
 
+    private static GameObject _rangeCircle;
+    private const int CircleSegments = 64;
+
     private void Awake()
     {
         if (_button == null)
@@ -73,11 +76,58 @@ public class BuildingButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         if (_tooltip != null && _settings != null)
             _tooltip.Show(_settings);
+
+        if (_buildingType == BuildingType.Harvester)
+            ShowGatheringRange();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (_tooltip != null)
             _tooltip.Hide();
+
+        HideGatheringRange();
+    }
+
+    private void ShowGatheringRange()
+    {
+        var mapSettings = TilemapsManager.Instance?.GetMapSettings();
+        if (mapSettings == null || !mapSettings.showGatheringRangeOnHover) return;
+
+        BaseNode selectedNode = GameManager.Instance.GetSelectedNode();
+        if (selectedNode == null) return;
+
+        HideGatheringRange();
+
+        _rangeCircle = new GameObject("GatheringRangeCircle");
+        _rangeCircle.transform.position = selectedNode.transform.position;
+
+        var lr = _rangeCircle.AddComponent<LineRenderer>();
+        lr.useWorldSpace = true;
+        lr.loop = true;
+        lr.positionCount = CircleSegments;
+        lr.startWidth = 0.05f;
+        lr.endWidth = 0.05f;
+        lr.material = new Material(Shader.Find("Sprites/Default"));
+        lr.startColor = mapSettings.gatheringRangeVisualColor;
+        lr.endColor = mapSettings.gatheringRangeVisualColor;
+
+        float radius = mapSettings.resourceGatheringRange;
+        Vector3 center = selectedNode.transform.position;
+
+        for (int i = 0; i < CircleSegments; i++)
+        {
+            float angle = (float)i / CircleSegments * Mathf.PI * 2f;
+            lr.SetPosition(i, center + new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius, 0f));
+        }
+    }
+
+    public static void HideGatheringRange()
+    {
+        if (_rangeCircle != null)
+        {
+            Destroy(_rangeCircle);
+            _rangeCircle = null;
+        }
     }
 }

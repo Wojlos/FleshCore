@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         MapGenerator.Instance.GenerateMap();
+        TilemapsManager.Instance.GenerateResources(MapManager.Instance.GetAllNodes());
+        TilemapsManager.Instance.CalculateResourceTileCounts(MapManager.Instance.GetAllNodes());
     }
 
     private void Start()

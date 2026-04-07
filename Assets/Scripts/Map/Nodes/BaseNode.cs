@@ -7,10 +7,13 @@ public abstract class BaseNode : MonoBehaviour
     [SerializeField] private UnitCounter _playerUnitCounter;
     [SerializeField] private UnitCounter _enemyUnitCounter;
     [SerializeField] private GameObject _unitTravelGroupPrefab;
+    [SerializeField] private NodeLightController _playerLight;
 
     private List<BaseNode> _connectedNodes = new List<BaseNode>();
     private List<SplineContainer> _splineContainers = new List<SplineContainer>();
     private BaseBuilding _building;
+
+    private Dictionary<ResourceType, int> _resourceTileCounts = new Dictionary<ResourceType, int>();
 
     private ConflictSide _owner;
     private HealthSystem _nodeHealthSystem;
@@ -336,6 +339,7 @@ public abstract class BaseNode : MonoBehaviour
 
         HideCounters();
         UpdateCounters();
+        UpdatePlayerLight();
     }
 
     public void CreateUnits(int count, bool player)
@@ -432,6 +436,7 @@ public abstract class BaseNode : MonoBehaviour
         var hs = _building.GetComponent<HealthSystem>();
         if (hs != null)
             hs.OnDie += (_, _) => RemoveBuilding();
+        UpdatePlayerLight();
     }
 
     public BaseBuilding GetBuilding()=> _building;
@@ -441,7 +446,7 @@ public abstract class BaseNode : MonoBehaviour
         _building = null;
         b.Cleanup();
         Destroy(b.gameObject);
-        
+        UpdatePlayerLight();
     }
 
     private void OnNodeOwnershipChanged(object sender, System.EventArgs e)
@@ -451,6 +456,7 @@ public abstract class BaseNode : MonoBehaviour
         
         _nodeHealthSystem.HealToFull();
         UpdateNodeColor();
+        UpdatePlayerLight();
     }
 
     private void UpdateNodeColor()
@@ -467,6 +473,33 @@ public abstract class BaseNode : MonoBehaviour
         if (_nodeHealthSystem != null)
             _nodeHealthSystem.HealToFull();
         UpdateNodeColor();
+        UpdatePlayerLight();
+    }
+
+    public void SetResourceTileCounts(Dictionary<ResourceType, int> counts)
+    {
+        _resourceTileCounts = counts;
+    }
+
+    public Dictionary<ResourceType, int> GetResourceTileCounts() => _resourceTileCounts;
+
+    public int GetResourceTileCount(ResourceType type)
+    {
+        return _resourceTileCounts.TryGetValue(type, out int count) ? count : 0;
+    }
+
+    private void UpdatePlayerLight()
+    {
+        if (_playerLight == null) return;
+
+        bool hasPlayerBuilding = _building != null && _building.Side == ConflictSide.Player;
+        bool hasPlayerUnits = _playerUnits > 0;
+        bool playerOwned = _owner == ConflictSide.Player;
+
+        if (hasPlayerBuilding || hasPlayerUnits || playerOwned)
+            _playerLight.TurnOn();
+        else
+            _playerLight.TurnOff();
     }
 
 }

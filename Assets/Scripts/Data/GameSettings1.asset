@@ -22,7 +22,7 @@ MonoBehaviour:
   - type: 2
     cost: 4
   startingPlayerUnits: 20
-  minLymphNodeDistanceFromPlayer: 2
+  minLymphNodeDistanceFromPlayer: 10
   pumpMaxBuildingIncrease: 3
   playerBuildingSettings:
   - type: 0
@@ -86,10 +86,12 @@ MonoBehaviour:
   playerStepDelayMax: 1.2
   enemyStepDelayMin: 0.8
   enemyStepDelayMax: 1.2
-  playerSpeedMin: 0.8
-  playerSpeedMax: 1.2
-  enemySpeedMin: 0.8
-  enemySpeedMax: 1.2
+  playerSpeedMin: 1
+  playerSpeedMax: 3
+  enemySpeedMin: 800
+  enemySpeedMax: 1200
+  playerUnitGroupColor: {r: 0, g: 0, b: 0.5, a: 1}
+  immunoUnitGroupColor: {r: 0.5, g: 0.5, b: 0, a: 1}
   maxImmunoBuildings: 1
   maxStartImmunoUnits: 30
   maxImmunoPatroleGroups: 1

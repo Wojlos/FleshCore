@@ -13,10 +13,57 @@ public class Harvester : PlayerBuilding
     protected override void Awake()
     {
         base.Awake();
-        _resourceProduction[ResourceType.Blood] = 1;
-        _resourceProduction[ResourceType.Lipids] = 1;
-        _resourceProduction[ResourceType.Bone] = 1;
+    }
+
+    public override void ApplySettings(BuildingSettings settings)
+    {
+        base.ApplySettings(settings);
+        CalculateProduction();
         ResourceManager.Instance.ChangeResourcesPerSecond(_resourceProduction, true);
+    }
+
+    private void CalculateProduction()
+    {
+        _resourceProduction.Clear();
+
+        if (_node == null) return;
+
+        var mapSettings = TilemapsManager.Instance.GetMapSettings();
+        if (mapSettings == null) return;
+
+        foreach (var resource in mapSettings.resources)
+        {
+            int tileCount = _node.GetResourceTileCount(resource.resourceType);
+            int production = CalculateProductionForResource(tileCount, resource.tilesPerOneResource);
+            _resourceProduction[resource.resourceType] = production;
+        }
+    }
+
+    private int CalculateProductionForResource(int tileCount, int tilesPerOneResource)
+    {
+        if (tileCount <= 0) return 0;
+        return Mathf.CeilToInt((float)tileCount / tilesPerOneResource);
+    }
+
+    public static Dictionary<ResourceType, int> CalculateProductionForNode(BaseNode node)
+    {
+        var production = new Dictionary<ResourceType, int>();
+
+        var mapSettings = TilemapsManager.Instance.GetMapSettings();
+        if (mapSettings == null || node == null) return production;
+
+        foreach (var resource in mapSettings.resources)
+        {
+            int tileCount = node.GetResourceTileCount(resource.resourceType);
+            if (tileCount <= 0)
+            {
+                production[resource.resourceType] = 0;
+                continue;
+            }
+            production[resource.resourceType] = Mathf.CeilToInt((float)tileCount / resource.tilesPerOneResource);
+        }
+
+        return production;
     }
 
     public override void Cleanup()
