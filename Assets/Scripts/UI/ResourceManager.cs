@@ -190,25 +190,24 @@ public class ResourceManager : MonoBehaviour
 
     public int TryChangeUnits(int change)
     {
-        int tempCount = _currentUnits + change;
-     
-        if (tempCount < 0)
+        if (change > 0)
         {
-            int actual = _currentUnits;
-            _currentUnits = 0;
-            UpdateCounters();
-            return -actual;
-        }
-        if (tempCount > _maxUnits)
-        {
-            int actual = _maxUnits - _currentUnits;
-            _currentUnits = _maxUnits;
+            if (_currentUnits >= _maxUnits)
+                return 0;
+
+            int actual = Mathf.Min(change, _maxUnits - _currentUnits);
+            _currentUnits += actual;
             UpdateCounters();
             return actual;
         }
-        _currentUnits = tempCount;
-        UpdateCounters();
-        return change;
+        else if (change < 0)
+        {
+            int actual = Mathf.Max(change, -_currentUnits);
+            _currentUnits += actual;
+            UpdateCounters();
+            return actual;
+        }
+        return 0;
     }
 
 

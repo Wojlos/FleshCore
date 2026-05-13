@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8657282464386990400}
   - component: {fileID: 7431885128448341690}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -103,7 +103,7 @@ GameObject:
   - component: {fileID: 9127513956067821261}
   - component: {fileID: 2728880368498629196}
   - component: {fileID: 3038574954303706114}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: BloodPump
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -120,7 +120,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8657282464386990400}
@@ -176,7 +176,7 @@ SpriteRenderer:
   m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: 1569033066621811975, guid: 0fe68fde896620e4eb449e1a492b76d2, type: 3}
-  m_Color: {r: 0.98490566, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

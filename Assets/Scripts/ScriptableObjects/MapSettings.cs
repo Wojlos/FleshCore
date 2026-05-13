@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 public enum ResourceDrawingMode
 {
-    Spherical
+    Spherical,
+    DLANoise
 }
 
 [System.Serializable]
@@ -81,4 +82,43 @@ public class MapSettings : ScriptableObject
 
     [Tooltip("Show the gathering range circle when hovering over Harvester button")]
     public bool showGatheringRangeOnHover = true;
+
+    [Header("DLA Noise Textures")]
+    [Tooltip("Black-and-white DLA noise images used by the DLANoise drawing mode. Center of image = center of resource node.")]
+    public List<Texture2D> smalDLANoises = new List<Texture2D>();
+
+    [Header("Spline Visuals")]
+    [Tooltip("Material applied to spline extrude meshes")]
+    public Material splineMaterial;
+
+    [Tooltip("Radius of the extruded spline tube")]
+    [Min(0.01f)]
+    public float splineRadius = 0.2f;
+
+    [Tooltip("Number of mesh segments per world unit along the spline")]
+    [Min(1)]
+    public int splineSegmentsPerUnit = 12;
+
+    [Tooltip("Flip the normals of the extruded spline mesh")]
+    public bool splineFlipNormals = true;
+
+    [Tooltip("Sorting order for spline meshes (lower = drawn earlier / behind other sprites)")]
+    public int splineSortingOrder = -10;
+
+    [Header("Spline Bends")]
+    [Tooltip("Average number of random bend points added per world unit of spline length")]
+    [Min(0f)]
+    public float bendPointsPerUnit = 0.4f;
+
+    [Tooltip("Minimum perpendicular offset of a bend point from the straight line")]
+    [Min(0f)]
+    public float bendOffsetMin = 0.15f;
+
+    [Tooltip("Maximum perpendicular offset of a bend point from the straight line")]
+    [Min(0f)]
+    public float bendOffsetMax = 0.5f;
+
+    [Tooltip("Fraction of spline length at each end where no bend points are placed (0-0.5)")]
+    [Range(0f, 0.5f)]
+    public float bendMargin = 0.15f;
 }

@@ -40,7 +40,7 @@ public static class SquareGraphBuilder
     }
     private static GraphNode[,] CreateGrid(GraphSettings settings)
     {
-        int verts = settings.numberOfVertices;
+        int verts = settings.size;
         
         GraphNode[,] grid = new GraphNode[verts, verts];
 

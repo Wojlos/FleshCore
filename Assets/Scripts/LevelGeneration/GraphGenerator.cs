@@ -10,6 +10,7 @@ public static class GraphGenerator
         switch (settings.type)
         {
             case GraphType.Square: return SquareGraphBuilder.BuildGraph(settings);
+            case GraphType.PoissonDelaunay: return PoissonDelaunayGraphBuilder.BuildGraph(settings);
 
             default:
                 throw new NotImplementedException($"No implementation for creating graph of type '{settings.type}'.");

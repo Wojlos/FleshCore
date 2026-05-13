@@ -52,7 +52,7 @@ Material:
     m_Floats:
     - _BigBorderDisplacement: 26.45
     - _BigBorderWFactor: 11.04
-    - _BigCellDens: 1.76
+    - _BigCellDens: 1.55
     - _ChangeStep: 0.2
     - _DistanceToLight: 0
     - _LightDivScale: 5.6

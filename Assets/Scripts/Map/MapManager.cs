@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Splines;
+using Unity.Mathematics;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 public struct NodeSelectionData
 {
@@ -21,6 +23,8 @@ public class MapManager : MonoBehaviour
     [SerializeField] private SplineContainer _splineContainerPrefab;
 
     [SerializeField] private Transform _splinesParent;
+
+    [SerializeField] private MapSettings _mapSettings;
 
     private readonly List<BaseNode> _mapNodes = new List<BaseNode>();
 
@@ -78,15 +82,85 @@ public class MapManager : MonoBehaviour
             container.RemoveSplineAt(i);
         }
 
-        Spline newSpline = new Spline();
-        container.AddSpline(newSpline); // now container has spline at index 0
+        Vector3 startPos = n1.transform.position;
+        Vector3 endPos = n2.transform.position;
 
-        newSpline.Add(new BezierKnot(n1.transform.position), TangentMode.AutoSmooth);
-        newSpline.Add(new BezierKnot(n2.transform.position), TangentMode.AutoSmooth);
+        Spline newSpline = new Spline();
+        container.AddSpline(newSpline);
+
+        quaternion knotRotation = (quaternion)Quaternion.Euler(0f, 270f, 0f);
+        quaternion inverseRotation = math.inverse(knotRotation);
+
+        List<float3> positions = new List<float3>();
+        positions.Add(new float3(startPos.x, startPos.y, 0f));
+
+        if (_mapSettings != null)
+        {
+            float straightLength = Vector3.Distance(startPos, endPos);
+            int bendCount = Mathf.Max(0, Mathf.RoundToInt(straightLength * _mapSettings.bendPointsPerUnit) + Random.Range(-1, 2));
+
+            if (bendCount > 0)
+            {
+                Vector3 direction = (endPos - startPos).normalized;
+                Vector3 perpendicular = new Vector3(-direction.y, direction.x, 0f);
+
+                for (int i = 0; i < bendCount; i++)
+                {
+                    float t = (i + 1f) / (bendCount + 1f);
+                    Vector3 pointOnLine = Vector3.Lerp(startPos, endPos, t);
+                    float offset = Random.Range(_mapSettings.bendOffsetMin, _mapSettings.bendOffsetMax);
+                    if (Random.value < 0.5f) offset = -offset;
+                    Vector3 bendPoint = pointOnLine + perpendicular * offset;
+                    positions.Add(new float3(bendPoint.x, bendPoint.y, 0f));
+                }
+            }
+        }
+
+        positions.Add(new float3(endPos.x, endPos.y, 0f));
+
+        for (int i = 0; i < positions.Count; i++)
+        {
+            float3 prev = positions[Mathf.Max(0, i - 1)];
+            float3 next = positions[Mathf.Min(positions.Count - 1, i + 1)];
+            float3 worldTangent = (next - prev) / 6f;
+            float3 localTangent = math.mul(inverseRotation, worldTangent);
+
+            newSpline.Add(new BezierKnot(positions[i], -localTangent, localTangent, knotRotation), TangentMode.Mirrored);
+        }
+
+        for (int i = 0; i < newSpline.Count; i++)
+        {
+            var knot = newSpline[i];
+            knot.Rotation = knotRotation;
+            newSpline[i] = knot;
+        }
 
         var extrude = container.GetComponent<SplineExtrude>();
-        if (extrude != null)
+        if (extrude != null && _mapSettings != null)
+        {
+            extrude.Radius = _mapSettings.splineRadius;
+            extrude.SegmentsPerUnit = _mapSettings.splineSegmentsPerUnit;
+            extrude.FlipNormals = _mapSettings.splineFlipNormals;
             extrude.Rebuild();
+        }
+        else if (extrude != null)
+        {
+            extrude.Rebuild();
+        }
+
+        {
+            var meshRenderer = container.GetComponent<MeshRenderer>();
+            if (meshRenderer != null)
+            {
+                if (_mapSettings != null && _mapSettings.splineMaterial != null)
+                    meshRenderer.material = _mapSettings.splineMaterial;
+
+                if (_mapSettings != null)
+                    meshRenderer.sortingOrder = _mapSettings.splineSortingOrder;
+            }
+        }
+
+        container.transform.position = Vector3.zero;
 
         n1.AddSplineContainer(container);
         n2.AddSplineContainer(container);

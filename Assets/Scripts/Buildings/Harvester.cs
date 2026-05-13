@@ -68,9 +68,11 @@ public class Harvester : PlayerBuilding
 
     public override void Cleanup()
     {
+        if (_active)
+        {
+            ResourceManager.Instance.ChangeResourcesPerSecond(_resourceProduction, false);
+        }
         base.Cleanup();
-        ResourceManager.Instance.ChangeResourcesPerSecond(_resourceProduction, false);
-
     }
 
     protected override void OnUpdate()

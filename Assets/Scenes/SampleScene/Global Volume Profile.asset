@@ -12,22 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
   m_Name: Bloom
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.Bloom
-  active: 0
+  active: 1
   skipIterations:
     m_OverrideState: 1
     m_Value: 1
   threshold:
     m_OverrideState: 1
-    m_Value: 1.1
+    m_Value: 1.2
   intensity:
     m_OverrideState: 1
-    m_Value: 23.93
+    m_Value: 1.09
   scatter:
     m_OverrideState: 1
-    m_Value: 0.7
+    m_Value: 0.832
   clamp:
     m_OverrideState: 1
-    m_Value: 65472
+    m_Value: 2
   tint:
     m_OverrideState: 1
     m_Value: {r: 1, g: 1, b: 1, a: 1}
@@ -42,14 +42,14 @@ MonoBehaviour:
     m_Value: 0
   maxIterations:
     m_OverrideState: 1
-    m_Value: 6
+    m_Value: 4
   dirtTexture:
     m_OverrideState: 1
-    m_Value: {fileID: 10912, guid: 0000000000000000f000000000000000, type: 0}
+    m_Value: {fileID: 2800000, guid: f01f2efacd42c7345a8504f5ea51124a, type: 3}
     dimension: 1
   dirtIntensity:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,16 +80,16 @@ MonoBehaviour:
   active: 1
   color:
     m_OverrideState: 1
-    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    m_Value: {r: 0.14716971, g: 0.047483053, b: 0.047483053, a: 1}
   center:
     m_OverrideState: 1
     m_Value: {x: 0.5, y: 0.5}
   intensity:
     m_OverrideState: 1
-    m_Value: 0.74
+    m_Value: 0.179
   smoothness:
     m_OverrideState: 1
-    m_Value: 0.181
+    m_Value: 0.715
   rounded:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1

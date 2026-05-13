@@ -1,14 +1,19 @@
 using UnityEngine;
 using System.Collections.Generic;
+
 public enum GraphType
 {
-    Square
+    Square,
+    PoissonDelaunay
 }
 
 [System.Serializable]
 public class GraphSettings
 {
-    [Min(2)] public int numberOfVertices = 2;
+    [Min(2)] public int size = 2;
+    [Min(0.1f)] public float minDistance = 1f;
+    [Min(0.1f)] public float maxDistance = 2f;
+    [Min(0.1f)] public float maxEdgeLength = 3f;
     [Min(1)] public int scaleFactor = 4;
 
     public GraphType type;

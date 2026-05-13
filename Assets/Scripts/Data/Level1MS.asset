@@ -25,8 +25,8 @@ MonoBehaviour:
     isBottom: 1
   - resourceType: 2
     density: 8
-    nodeSize: 2
-    drawingMode: 0
+    nodeSize: 5
+    drawingMode: 1
     material: {fileID: 2100000, guid: 6d50822a9511eff408edabf6ad80069e, type: 2}
     tileScale: 0.3
     tilesPerOneResource: 40
@@ -34,16 +34,29 @@ MonoBehaviour:
   - resourceType: 1
     density: 8
     nodeSize: 2.5
-    drawingMode: 0
+    drawingMode: 1
     material: {fileID: 2100000, guid: 2d7a47875a390b64b81f9d9372431a0f, type: 2}
     tileScale: 0.3
     tilesPerOneResource: 40
     isBottom: 0
-  nodeExclusionRadius: 1
-  splineExclusionRadius: 0.8
+  nodeExclusionRadius: 0.7
+  splineExclusionRadius: 0.6
   exclusionNoiseScale: 2
   exclusionNoiseAmplitude: 0.5
   splineSampleResolution: 0.3
   resourceGatheringRange: 3
   gatheringRangeVisualColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   showGatheringRangeOnHover: 1
+  smalDLANoises:
+  - {fileID: 2800000, guid: 5d2699645c57ad946a6fbb8336e176d0, type: 3}
+  - {fileID: 2800000, guid: ff7403c1402d88a43b45729bf8154909, type: 3}
+  - {fileID: 2800000, guid: f01f2efacd42c7345a8504f5ea51124a, type: 3}
+  splineMaterial: {fileID: 2100000, guid: d1757fb33d6df914a93afb1a509b059c, type: 2}
+  splineRadius: 0.2
+  splineSegmentsPerUnit: 10
+  splineFlipNormals: 1
+  splineSortingOrder: -10
+  bendPointsPerUnit: 0.3
+  bendOffsetMin: 0.3
+  bendOffsetMax: 0.3
+  bendMargin: 0.094

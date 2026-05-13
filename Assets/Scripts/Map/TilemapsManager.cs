@@ -15,6 +15,8 @@ public class TilemapsManager : MonoBehaviour
     [SerializeField] private Grid _grid;
     [SerializeField] private float _tileScale = 0.3f;
     [SerializeField] private int _shadowcasterBorder = 2;
+    [SerializeField] private int _shadowcasterDownsample = 2;
+    [SerializeField] private float _shadowcasterVertexDistance = 0.5f;
 
     private readonly Dictionary<ResourceType, Tilemap> _tilemaps = new Dictionary<ResourceType, Tilemap>();
     private Tilemap _shadowcasterTilemap;
@@ -93,7 +95,7 @@ public class TilemapsManager : MonoBehaviour
         foreach (var centre in nonBottomCentres)
         {
             Tilemap tilemap = _tilemaps[centre.resource.resourceType];
-            DrawResource(tilemap, centre.position, centre.resource, occupied);
+            DrawResource(tilemap, centre.position, centre.resource, occupied, rng);
         }
 
         var bottomCentres = allCentres
@@ -103,7 +105,7 @@ public class TilemapsManager : MonoBehaviour
         foreach (var centre in bottomCentres)
         {
             Tilemap tilemap = _tilemaps[centre.resource.resourceType];
-            DrawResource(tilemap, centre.position, centre.resource, occupied);
+            DrawResource(tilemap, centre.position, centre.resource, occupied, rng);
         }
 
         BuildShadowcaster();
@@ -211,12 +213,15 @@ public class TilemapsManager : MonoBehaviour
         return true;
     }
 
-    private void DrawResource(Tilemap tilemap, Vector2 centre, ResourceSettings resource, HashSet<Vector2Int> occupied)
+    private void DrawResource(Tilemap tilemap, Vector2 centre, ResourceSettings resource, HashSet<Vector2Int> occupied, System.Random rng)
     {
         switch (resource.drawingMode)
         {
             case ResourceDrawingMode.Spherical:
                 DrawSpherical(tilemap, centre, resource.nodeSize, occupied);
+                break;
+            case ResourceDrawingMode.DLANoise:
+                DrawDLANoise(tilemap, centre, resource.nodeSize, occupied, rng);
                 break;
             default:
                 Debug.LogWarning($"TilemapsManager: DrawingMode '{resource.drawingMode}' not implemented.");
@@ -282,6 +287,56 @@ public class TilemapsManager : MonoBehaviour
                     tilemap.SetTile(cell, _resourceRuleTile);
                     occupied.Add(key);
                 }
+            }
+        }
+    }
+
+    private void DrawDLANoise(Tilemap tilemap, Vector2 centre, float radius, HashSet<Vector2Int> occupied, System.Random rng)
+    {
+        var textures = _mapSettings.smalDLANoises;
+        if (textures == null || textures.Count == 0)
+        {
+            Debug.LogWarning("TilemapsManager: No DLA noise textures assigned in MapSettings.smalDLANoises.");
+            return;
+        }
+
+        Texture2D tex = textures[rng.Next(textures.Count)];
+        if (tex == null)
+            return;
+
+        int texW = tex.width;
+        int texH = tex.height;
+        float worldSize = radius * 2f;
+
+        float scaledCellSize = _grid.cellSize.x * _tileScale;
+        float pixelWorldSize = worldSize / Mathf.Max(texW, texH);
+        int pixelStep = Mathf.Max(1, Mathf.FloorToInt(scaledCellSize / pixelWorldSize));
+
+        for (int px = 0; px < texW; px += pixelStep)
+        {
+            for (int py = 0; py < texH; py += pixelStep)
+            {
+                Color pixel = tex.GetPixel(px, py);
+                if (pixel.a < 0.1f)
+                    continue;
+
+                float offsetX = ((float)px / texW - 0.5f) * worldSize;
+                float offsetY = ((float)py / texH - 0.5f) * worldSize;
+                Vector2 worldPos = centre + new Vector2(offsetX, offsetY);
+
+                Vector3Int cell = WorldToCell(tilemap, new Vector3(worldPos.x, worldPos.y, 0f));
+                Vector3 cellWorld = CellCenterToWorld(tilemap, cell);
+                Vector2 cellWorld2D = new Vector2(cellWorld.x, cellWorld.y);
+
+                Vector2Int key = WorldToOccupancyKey(cellWorld);
+                if (occupied.Contains(key))
+                    continue;
+
+                if (IsInExclusionZone(cellWorld2D))
+                    continue;
+
+                tilemap.SetTile(cell, _resourceRuleTile);
+                occupied.Add(key);
             }
         }
     }
@@ -439,14 +494,20 @@ public class TilemapsManager : MonoBehaviour
 
     private void BuildShadowcaster()
     {
+        float shadowScale = _tileScale * Mathf.Max(1, _shadowcasterDownsample);
+
         GameObject go = Instantiate(_tilemapPrefab, _grid.transform);
         go.name = "Tilemap_Shadowcaster";
         go.transform.localPosition = Vector3.zero;
-        go.transform.localScale = new Vector3(_tileScale, _tileScale, 1f);
+        go.transform.localScale = new Vector3(shadowScale, shadowScale, 1f);
 
         _shadowcasterTilemap = go.GetComponent<Tilemap>();
         TilemapRenderer renderer = go.GetComponent<TilemapRenderer>();
         renderer.enabled = false;
+
+        CompositeCollider2D composite = go.GetComponent<CompositeCollider2D>();
+        if (composite != null)
+            composite.vertexDistance = _shadowcasterVertexDistance;
 
         HashSet<Vector3Int> compositeCells = new HashSet<Vector3Int>();
 

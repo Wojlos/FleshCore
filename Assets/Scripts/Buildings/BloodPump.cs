@@ -17,9 +17,11 @@ public class BloodPump : PlayerBuilding
 
     public override void Cleanup()
     {
+        if (_active)
+        {
+            ResourceManager.Instance.ChangeMaxBuildings(-maxBuildingIncrease);
+        }
         base.Cleanup();
-        ResourceManager.Instance.ChangeMaxBuildings(-maxBuildingIncrease);
-
     }
 
     public override void Disable()

@@ -88,8 +88,8 @@ MonoBehaviour:
   enemyStepDelayMax: 1.2
   playerSpeedMin: 1
   playerSpeedMax: 3
-  enemySpeedMin: 800
-  enemySpeedMax: 1200
+  enemySpeedMin: 1
+  enemySpeedMax: 3
   playerUnitGroupColor: {r: 0, g: 0, b: 0.5, a: 1}
   immunoUnitGroupColor: {r: 0.5, g: 0.5, b: 0, a: 1}
   maxImmunoBuildings: 1
@@ -103,7 +103,7 @@ MonoBehaviour:
   selectionSamplePointsPerRadius: 8
   maxNodeHP: 30
   immunoNodeColor: {r: 0.9622642, g: 0.918963, b: 0.695372, a: 1}
-  playerNodeColor: {r: 0.47335705, g: 0.83328134, b: 0.93962264, a: 1}
+  playerNodeColor: {r: 1, g: 1, b: 1, a: 1}
   playerConquestDamageChance: 0.1
   immunoConquestDamageChance: 0.1
   nodeConquestTickInterval: 0.5

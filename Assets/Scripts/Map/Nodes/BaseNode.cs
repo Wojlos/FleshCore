@@ -8,6 +8,7 @@ public abstract class BaseNode : MonoBehaviour
     [SerializeField] private UnitCounter _enemyUnitCounter;
     [SerializeField] private GameObject _unitTravelGroupPrefab;
     [SerializeField] private NodeLightController _playerLight;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
 
     private List<BaseNode> _connectedNodes = new List<BaseNode>();
     private List<SplineContainer> _splineContainers = new List<SplineContainer>();
@@ -17,14 +18,12 @@ public abstract class BaseNode : MonoBehaviour
 
     private ConflictSide _owner;
     private HealthSystem _nodeHealthSystem;
-    private SpriteRenderer _spriteRenderer;
     private bool _conquering = false;
     private float _conquestTimer = 0f;
     private float _nodeConquestTickInterval;
     private float _playerConquestDamageChance;
     private float _immunoConquestDamageChance;
     private int _maxNodeHP;
-
 
     private int _playerUnits = 0;
     private int _enemyUnits = 0;
@@ -58,7 +57,6 @@ public abstract class BaseNode : MonoBehaviour
         _immunoConquestDamageChance = settings.immunoConquestDamageChance;
         _maxNodeHP = settings.maxNodeHP;
 
-        _spriteRenderer = GetComponent<SpriteRenderer>();
         _nodeHealthSystem = gameObject.AddComponent<HealthSystem>();
         _nodeHealthSystem.MaxHealth = _maxNodeHP;
         _nodeHealthSystem.HealToFull();
