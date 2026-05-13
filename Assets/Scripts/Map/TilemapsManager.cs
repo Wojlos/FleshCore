@@ -474,6 +474,65 @@ public class TilemapsManager : MonoBehaviour
         return count;
     }
 
+    public struct EdgeTileData
+    {
+        public Vector2 position;
+        public ResourceType resourceType;
+    }
+
+    public List<EdgeTileData> GetEdgeTilePositionsInRange(Vector3 worldCenter, float range)
+    {
+        List<EdgeTileData> edgePositions = new List<EdgeTileData>();
+
+        foreach (var kvp in _tilemaps)
+        {
+            ResourceType resourceType = kvp.Key;
+            Tilemap tilemap = kvp.Value;
+            float tileScale = tilemap.transform.localScale.x;
+            float scaledCellSize = _grid.cellSize.x * tileScale;
+            int cellRadius = Mathf.CeilToInt(range / scaledCellSize);
+            Vector3Int centreCell = WorldToCell(tilemap, worldCenter);
+
+            for (int x = -cellRadius; x <= cellRadius; x++)
+            {
+                for (int y = -cellRadius; y <= cellRadius; y++)
+                {
+                    Vector3Int cell = new Vector3Int(centreCell.x + x, centreCell.y + y, 0);
+                    if (!tilemap.HasTile(cell))
+                        continue;
+
+                    Vector3 cellWorld = CellCenterToWorld(tilemap, cell);
+                    float dist = Vector2.Distance(new Vector2(cellWorld.x, cellWorld.y), new Vector2(worldCenter.x, worldCenter.y));
+                    if (dist > range)
+                        continue;
+
+                    bool isEdge = false;
+                    Vector3Int[] neighbors = new Vector3Int[]
+                    {
+                        new Vector3Int(cell.x + 1, cell.y, 0),
+                        new Vector3Int(cell.x - 1, cell.y, 0),
+                        new Vector3Int(cell.x, cell.y + 1, 0),
+                        new Vector3Int(cell.x, cell.y - 1, 0)
+                    };
+
+                    foreach (var n in neighbors)
+                    {
+                        if (!tilemap.HasTile(n))
+                        {
+                            isEdge = true;
+                            break;
+                        }
+                    }
+
+                    if (isEdge)
+                        edgePositions.Add(new EdgeTileData { position = new Vector2(cellWorld.x, cellWorld.y), resourceType = resourceType });
+                }
+            }
+        }
+
+        return edgePositions;
+    }
+
     public MapSettings GetMapSettings() => _mapSettings;
 
     public void ClearTilemaps()

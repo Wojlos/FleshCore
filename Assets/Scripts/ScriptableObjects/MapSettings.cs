@@ -35,6 +35,9 @@ public class ResourceSettings
 
     [Tooltip("If true, this resource is the bottom fill layer (drawn last, skips tiles occupied by other resources)")]
     public bool isBottom = false;
+
+    [Tooltip("Color gradient used for excavation particles when harvesting this resource")]
+    public Gradient particleColorGradient;
 }
 
 [CreateAssetMenu(fileName = "MapSettings", menuName = "Scriptable Objects/MapSettings")]

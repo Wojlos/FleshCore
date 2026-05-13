@@ -9,10 +9,12 @@ public class Harvester : PlayerBuilding
     }
     private Dictionary<ResourceType, int> _resourceProduction =  new Dictionary<ResourceType, int>();
     private float _productionTimer;
+    private SawBlade _sawBlade;
 
     protected override void Awake()
     {
         base.Awake();
+        _sawBlade = GetComponentInChildren<SawBlade>();
     }
 
     public override void ApplySettings(BuildingSettings settings)
@@ -20,6 +22,28 @@ public class Harvester : PlayerBuilding
         base.ApplySettings(settings);
         CalculateProduction();
         ResourceManager.Instance.ChangeResourcesPerSecond(_resourceProduction, true);
+        InitializeSawBlade();
+    }
+
+    private void InitializeSawBlade()
+    {
+        if (_sawBlade == null || _node == null) return;
+
+        var mapSettings = TilemapsManager.Instance.GetMapSettings();
+        if (mapSettings == null) return;
+
+        float range = mapSettings.resourceGatheringRange;
+        var edgePoints = TilemapsManager.Instance.GetEdgeTilePositionsInRange(_node.transform.position, range);
+
+        var gradients = new Dictionary<ResourceType, Gradient>();
+        foreach (var resource in mapSettings.resources)
+        {
+            if (resource.particleColorGradient != null)
+                gradients[resource.resourceType] = resource.particleColorGradient;
+        }
+
+        _sawBlade.Initialize(edgePoints, gradients, _node.transform.position);
+        _sawBlade.SetActive(true);
     }
 
     private void CalculateProduction()
@@ -95,6 +119,7 @@ public class Harvester : PlayerBuilding
 
         base.Disable();
         ResourceManager.Instance.ChangeResourcesPerSecond(_resourceProduction, false);
+        if (_sawBlade != null) _sawBlade.SetActive(false);
     }
 
     public override void Enable()
@@ -103,6 +128,7 @@ public class Harvester : PlayerBuilding
 
         base.Enable();
         ResourceManager.Instance.ChangeResourcesPerSecond(_resourceProduction, true);
+        if (_sawBlade != null) _sawBlade.SetActive(true);
     }
     
 
