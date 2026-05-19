@@ -23,6 +23,36 @@ MonoBehaviour:
     tileScale: 0.3
     tilesPerOneResource: 40
     isBottom: 1
+    particleColorGradient:
+      serializedVersion: 2
+      key0: {r: 0.10033977, g: 0, b: 0.159, a: 1}
+      key1: {r: 0.18668973, g: 0.0047750846, b: 0.21169549, a: 1}
+      key2: {r: 0.34969264, g: 0.019074144, b: 0, a: 0}
+      key3: {r: 0.807, g: 0.04401818, b: 0, a: 0}
+      key4: {r: 0.761, g: 0.061008442, b: 0.24767268, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 10409
+      ctime1: 22745
+      ctime2: 32151
+      ctime3: 50809
+      ctime4: 64070
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 5
+      m_NumAlphaKeys: 2
   - resourceType: 2
     density: 8
     nodeSize: 5
@@ -31,6 +61,36 @@ MonoBehaviour:
     tileScale: 0.3
     tilesPerOneResource: 40
     isBottom: 0
+    particleColorGradient:
+      serializedVersion: 2
+      key0: {r: 0.45098042, g: 0, b: 0.003921569, a: 1}
+      key1: {r: 0.38223493, g: 0.34721175, b: 0.19544461, a: 1}
+      key2: {r: 0.3962264, g: 0.35992122, b: 0.20259875, a: 0}
+      key3: {r: 0.9771933, g: 0.94531953, b: 0.82265866, a: 0}
+      key4: {r: 1, g: 0.9683002, b: 0.847, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 2544
+      ctime1: 15651
+      ctime2: 34926
+      ctime3: 49421
+      ctime4: 65535
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 5
+      m_NumAlphaKeys: 2
   - resourceType: 1
     density: 8
     nodeSize: 2.5
@@ -39,6 +99,36 @@ MonoBehaviour:
     tileScale: 0.3
     tilesPerOneResource: 40
     isBottom: 0
+    particleColorGradient:
+      serializedVersion: 2
+      key0: {r: 0.76470596, g: 0.49803925, b: 0.3921569, a: 1}
+      key1: {r: 0.6901961, g: 0.023529414, b: 0.03137255, a: 1}
+      key2: {r: 0.7686275, g: 0.7490196, b: 0.69411767, a: 0}
+      key3: {r: 1, g: 0.8313726, b: 0.5176471, a: 0}
+      key4: {r: 0.007843138, g: 0.007843138, b: 0.007843138, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 14880
+      ctime1: 26445
+      ctime2: 35389
+      ctime3: 60369
+      ctime4: 65535
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 1
+      m_ColorSpace: -1
+      m_NumColorKeys: 5
+      m_NumAlphaKeys: 2
   nodeExclusionRadius: 0.7
   splineExclusionRadius: 0.6
   exclusionNoiseScale: 2
