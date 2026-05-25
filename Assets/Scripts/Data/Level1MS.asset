@@ -129,12 +129,12 @@ MonoBehaviour:
       m_ColorSpace: -1
       m_NumColorKeys: 5
       m_NumAlphaKeys: 2
-  nodeExclusionRadius: 0.7
-  splineExclusionRadius: 0.6
+  nodeExclusionRadius: 2
+  splineExclusionRadius: 0.7
   exclusionNoiseScale: 2
   exclusionNoiseAmplitude: 0.5
   splineSampleResolution: 0.3
-  resourceGatheringRange: 3
+  resourceGatheringRange: 4
   gatheringRangeVisualColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   showGatheringRangeOnHover: 1
   smalDLANoises:

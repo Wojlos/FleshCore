@@ -2,11 +2,21 @@ using UnityEngine;
 
 public class DefenceOutpost : PlayerBuilding
 {
+    [SerializeField] private TurretController _turret;
+
     public DefenceOutpost() : base(BuildingType.DefenceOutpost)
     {
         
     }
     private float _unitProductionTimer = 0f;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        if (_turret != null && _active)
+            _turret.Activate();
+    }
+
     protected override void OnUpdate()
     {
 
@@ -23,5 +33,19 @@ public class DefenceOutpost : PlayerBuilding
             _node.CreateUnits(1, true);
         }
         
+    }
+
+    public override void Enable()
+    {
+        base.Enable();
+        if (_turret != null)
+            _turret.Activate();
+    }
+
+    public override void Disable()
+    {
+        base.Disable();
+        if (_turret != null)
+            _turret.Deactivate();
     }
 }
