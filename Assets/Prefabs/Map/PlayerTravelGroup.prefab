@@ -121,10 +121,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4043184949407706861}
-  - component: {fileID: 6169497701575818570}
   - component: {fileID: 4323403102514806819}
+  - component: {fileID: 6351236783933606537}
   m_Layer: 0
-  m_Name: UnitTravelGroup
+  m_Name: PlayerTravelGroup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,19 +147,6 @@ Transform:
   - {fileID: 264130887964215126}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6169497701575818570
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 193441050095844138}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ded84ac887c51cb4a8370f8ad2c9dc2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UnitTravelGroup
-  _visualisation: {fileID: 81644809050091664}
 --- !u!114 &4323403102514806819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,6 +170,20 @@ MonoBehaviour:
   m_ObjectForwardAxis: 2
   m_ObjectUpAxis: 1
   m_StartOffset: 0
+--- !u!114 &6351236783933606537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 193441050095844138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3627f5397e0d9e4d95b8cf750530502, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerTravelGroup
+  _visualisation: {fileID: 81644809050091664}
+  _light: {fileID: 3756114572980665335}
 --- !u!1001 &8135721047812098735
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -243,5 +244,10 @@ PrefabInstance:
 --- !u!4 &264130887964215126 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8308440461913263609, guid: 53b7c788b32c45f4fb2751ce239ac9fb, type: 3}
+  m_PrefabInstance: {fileID: 8135721047812098735}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3756114572980665335 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4956076689222037848, guid: 53b7c788b32c45f4fb2751ce239ac9fb, type: 3}
   m_PrefabInstance: {fileID: 8135721047812098735}
   m_PrefabAsset: {fileID: 0}

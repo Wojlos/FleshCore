@@ -172,7 +172,7 @@ public class GameManager : MonoBehaviour
         BuildingsManager.Instance.BuildBuilding(pumpPrefab, startNode);
 
         int unitsToSpawn = settings.startingPlayerUnits;
-        startNode.CreateUnits(unitsToSpawn, true);
+        startNode.CreateUnits(unitsToSpawn, ConflictSide.Player);
 
         CenterCameraOnNode(startNode);
     }

@@ -641,7 +641,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NeutralNode
   _playerUnitCounter: {fileID: 8911759714282242468}
   _enemyUnitCounter: {fileID: 2024199569308514200}
-  _unitTravelGroupPrefab: {fileID: 193441050095844138, guid: ec80f678d1c58334b88c12856afbe4cd, type: 3}
+  _playerTravelGroupPrefab: {fileID: 193441050095844138, guid: ec80f678d1c58334b88c12856afbe4cd, type: 3}
+  _enemyTravelGroupPrefab: {fileID: 193441050095844138, guid: a753a2ca59a31ca4aaf47952e9316c0f, type: 3}
   _playerLight: {fileID: 5571014287991076501}
   _spriteRenderer: {fileID: 7994199287341185455}
 --- !u!58 &1212836272707715036

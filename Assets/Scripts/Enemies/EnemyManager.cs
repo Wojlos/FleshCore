@@ -116,7 +116,7 @@ public class EnemyManager : MonoBehaviour
         if (node.GetBuilding() != null) return false;
         if (node.GetUnits(ConflictSide.Immuno) < unitCost) return false;
 
-        node.DestroyUnits(unitCost, false);
+        node.DestroyUnits(unitCost, ConflictSide.Immuno);
         SpawnBuilding(_buildingPrefab, node);
         return true;
     }

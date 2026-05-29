@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class LymphNode : EnemyBuilding
 {
-    private List<UnitTravelGroup> _currentTravelGroups = new List<UnitTravelGroup>();
+    private List<EnemyTravelGroup> _currentTravelGroups = new List<EnemyTravelGroup>();
     private int _maxPatrolGroups;
     private int _minPatrolSize;
     private bool _patrolsBlocked;
@@ -43,7 +43,7 @@ public class LymphNode : EnemyBuilding
 
     private void SpawnPatrolGroup()
     {
-        var tg = _node.SendPatrol(_minPatrolSize, ConflictSide.Immuno);
+        var tg = _node.SendPatrol(_minPatrolSize, this);
         if (tg != null)
             _currentTravelGroups.Add(tg);
     }
@@ -114,7 +114,7 @@ public class LymphNode : EnemyBuilding
         int freeUnits = localUnits - unitsInLocalPatrols;
         if (freeUnits > 0)
         {
-            var tg = _node.SendUnitsDirected(freeUnits, encounterNode, ConflictSide.Immuno);
+            var tg = _node.SendUnitsDirected(freeUnits, encounterNode, ConflictSide.Immuno) as EnemyTravelGroup;
             if (tg != null)
                 _currentTravelGroups.Add(tg);
         }

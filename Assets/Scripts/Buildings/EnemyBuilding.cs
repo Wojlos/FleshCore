@@ -32,7 +32,7 @@ public abstract class EnemyBuilding : BaseBuilding
         if (_internalTimer >= spawnInterval)
         {
             _internalTimer -= spawnInterval;
-            _node.CreateUnits(1, false);
+            _node.CreateUnits(1, ConflictSide.Immuno);
         }
     }
 }

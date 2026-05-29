@@ -30,7 +30,7 @@ public class DefenceOutpost : PlayerBuilding
         if (_unitProductionTimer >= spawnInterval)
         {
             _unitProductionTimer -= spawnInterval;
-            _node.CreateUnits(1, true);
+            _node.CreateUnits(1, ConflictSide.Player);
         }
         
     }

@@ -22,7 +22,7 @@ MonoBehaviour:
   - type: 2
     cost: 4
   startingPlayerUnits: 20
-  minLymphNodeDistanceFromPlayer: 10
+  minLymphNodeDistanceFromPlayer: 3
   pumpMaxBuildingIncrease: 3
   playerBuildingSettings:
   - type: 0

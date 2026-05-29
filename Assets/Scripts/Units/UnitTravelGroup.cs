@@ -3,52 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Splines;
 
-public enum UnitState
+public enum BodyState
 {
-    Waiting,
-    Moving,
-    Fighting
+    Idle,
+    Moving
 }
 
-public enum UnitMode
-{
-    Patrol,
-    Directed
-}
-
-public class UnitTravelGroup : MonoBehaviour
+public abstract class UnitTravelGroup : MonoBehaviour
 {
     [SerializeField] private GameObject _visualisation;
 
-    private int _units;
-    private List<BaseNode> _path = new List<BaseNode>();
+    protected int _units;
+    protected ConflictSide _side;
+    protected BaseNode _currentNode;
+    protected BaseNode _previousNode;
 
-    private BaseNode _currentNode;
     private BaseNode _nextNode;
-    private BaseNode _originNode;
-    private BaseNode _previousNode;
-
     private SplineAnimate _splineAnimator;
     private Coroutine _moveCoroutine;
+    private float _movementSpeed;
+    protected float _stepDelay;
+    private float _waitTimer;
+    private bool _waitingForReady;
 
-    private UnitState _state;
-    private UnitMode _mode;
-    private ConflictSide _side;
-    
+    private BodyState _state;
+    private bool _isRegisteredOnNode;
+
     private MaterialPropertyBlock _materialPropertyBlock;
     private MeshRenderer _sphereRenderer;
 
-    private float _waitTimer;
-    private float _stepDelay;
-    private float _movementSpeed;
-    private int _unitsBeforeBattle;
-    private bool _isRegisteredOnNode;
-
-    private BaseBuilding _originBuilding;
-    private bool _tracksOriginBuilding;
-
-    private bool _fleeingEncounter;
-    private BaseNode _encounterNode;
+    private NodeEncounterController _currentEncounterController;
 
     // ──────────────────────────────────────────────
     // Lifecycle
@@ -59,52 +43,72 @@ public class UnitTravelGroup : MonoBehaviour
         _splineAnimator = GetComponent<SplineAnimate>();
         if (_splineAnimator == null)
             Debug.LogError($"{name}: Missing SplineAnimate component.");
-        
+
         _materialPropertyBlock = new MaterialPropertyBlock();
-        
+
         if (_visualisation != null)
             _sphereRenderer = _visualisation.GetComponent<MeshRenderer>();
+
+        OnAwake();
     }
 
     private void Update()
     {
+        if (_units <= 0)
+        {
+            OnBodyDying();
+            Cleanup();
+            Destroy(gameObject);
+            return;
+        }
+
         switch (_state)
         {
-            case UnitState.Waiting:
-                UpdateWaiting();
+            case BodyState.Idle:
+                UpdateIdle();
                 break;
-            case UnitState.Moving:
-                break;
-            case UnitState.Fighting:
-                UpdateFighting();
+            case BodyState.Moving:
                 break;
         }
     }
 
     private void OnDestroy()
     {
-        if (_state == UnitState.Moving && _currentNode != null && _units > 0)
+        if (_state == BodyState.Moving && _currentNode != null && _units > 0)
         {
-            _currentNode.ChangeUnitCount(_units, _side == ConflictSide.Player);
+            _currentNode.ChangeUnitCount(_units, _side);
             _currentNode.AddTravelGroup(this, _side);
         }
+
+        UnsubscribeFromEncounter();
 
         if (_isRegisteredOnNode && _currentNode != null)
             _currentNode.RemoveTravelGroup(this, _side);
     }
 
     // ──────────────────────────────────────────────
+    // Abstract / Virtual Hooks
+    // ──────────────────────────────────────────────
+
+    protected virtual void OnAwake() { }
+    protected abstract void OnArrivedAtNode();
+    protected abstract void OnReadyToMove();
+    protected virtual void OnEncounterChanged(EncounterInfo info) { }
+    protected virtual void OnBodyDying() { }
+
+    // ──────────────────────────────────────────────
     // Public API
     // ──────────────────────────────────────────────
 
-    public void SetupPatrol(int units, BaseNode start, BaseNode destination, ConflictSide side)
-    {
-        Setup(units, start, destination, side, UnitMode.Patrol);
-    }
+    public int GetUnits() => _units;
+    public BaseNode GetCurrentNode() => _currentNode;
+    public ConflictSide GetSide() => _side;
+    public BodyState GetState() => _state;
 
-    public void SetupDirected(int units, BaseNode start, BaseNode destination, ConflictSide side)
+    public void ApplyDamage(int amount)
     {
-        Setup(units, start, destination, side, UnitMode.Directed);
+        _units -= amount;
+        if (_units < 0) _units = 0;
     }
 
     public void Disband()
@@ -116,7 +120,7 @@ public class UnitTravelGroup : MonoBehaviour
     public void DisbandAndDeleteUnits()
     {
         if (_currentNode != null && _units > 0)
-            _currentNode.DestroyUnits(_units, _side == ConflictSide.Player);
+            _currentNode.DestroyUnits(_units, _side);
         _units = 0;
         Cleanup();
         Destroy(gameObject);
@@ -127,134 +131,81 @@ public class UnitTravelGroup : MonoBehaviour
         Disband();
     }
 
-    public int GetUnits() => _units;
-    public BaseNode GetCurrentNode() => _currentNode;
-    public ConflictSide GetSide() => _side;
-
-    public void RedirectTo(BaseNode destination)
-    {
-        _mode = UnitMode.Directed;
-
-        BaseNode fromNode = (_state == UnitState.Moving && _nextNode != null) ? _nextNode : _currentNode;
-        if (fromNode == null) return;
-
-        var newPath = PathfindingManager.Instance.GetPath(fromNode, destination);
-        if (newPath == null || newPath.Count == 0)
-            return;
-
-        _path = newPath;
-        DequeueNextNode();
-    }
-
     // ──────────────────────────────────────────────
-    // Setup
+    // Protected Setup (called by subclasses)
     // ──────────────────────────────────────────────
 
-    private void Setup(int units, BaseNode start, BaseNode destination, ConflictSide side, UnitMode mode)
+    protected void SetupBase(int units, BaseNode startNode, ConflictSide side, float speed, float stepDelay, Color color)
     {
         StopMoveCoroutine();
-        _splineAnimator.Pause();
+        if (_splineAnimator != null)
+            _splineAnimator.Pause();
 
         _units = units;
         _side = side;
-        _originNode = start;
-        _mode = mode;
+        _movementSpeed = speed;
+        _stepDelay = stepDelay;
+        _currentNode = startNode;
 
-        var settings = GameManager.Instance.GetGameSettings();
-        if (side == ConflictSide.Player)
-        {
-            _stepDelay = Random.Range(settings.playerStepDelayMin, settings.playerStepDelayMax);
-            _movementSpeed = Random.Range(settings.playerSpeedMin, settings.playerSpeedMax);
-            SetSphereColor(settings.playerUnitGroupColor);
-        }
-        else
-        {
-            _stepDelay = Random.Range(settings.enemyStepDelayMin, settings.enemyStepDelayMax);
-            _movementSpeed = Random.Range(settings.enemySpeedMin, settings.enemySpeedMax);
-            SetSphereColor(settings.immunoUnitGroupColor);
-        }
-
-        var building = start.GetBuilding();
-        _originBuilding = (building != null && building.Side == side) ? building : null;
-        _tracksOriginBuilding = _originBuilding != null;
-
-        var newPath = PathfindingManager.Instance.GetPath(start, destination);
-        if (newPath == null || newPath.Count == 0)
-        {
-            Debug.LogWarning("Setup: Path is empty or null.");
-            Disband();
-            return;
-        }
-
-        _path = newPath;
-        _currentNode = DequeueNextNode();
+        SetSphereColor(color);
 
         if (_currentNode != null)
         {
             transform.position = _currentNode.transform.position;
             RegisterOnNode();
+            SubscribeToEncounter();
         }
 
-        EnterWaiting();
+        EnterIdle(true);
     }
 
     // ──────────────────────────────────────────────
-    // Waiting State
+    // Protected Movement Commands
     // ──────────────────────────────────────────────
 
-    private void EnterWaiting()
+    protected void MoveTo(BaseNode target)
     {
-        _state = UnitState.Waiting;
+        if (target == null || _currentNode == null) return;
+
+        // Cannot leave a node while opposing units are present
+        if (_currentNode.GetOpposingUnits(_side) > 0)
+        {
+            StayIdle();
+            return;
+        }
+
+        _nextNode = target;
+        EnterMoving();
+    }
+
+    protected void StayIdle()
+    {
+        _waitingForReady = false;
         _waitTimer = _stepDelay;
     }
 
-    private void UpdateWaiting()
+    // ──────────────────────────────────────────────
+    // Idle State
+    // ──────────────────────────────────────────────
+
+    private void EnterIdle(bool isInitial = false)
     {
-        if (IsOriginBuildingDestroyed())
-        {
-            DisbandAndDeleteUnits();
+        _state = BodyState.Idle;
+        _waitTimer = _stepDelay;
+        _waitingForReady = false;
+
+        if (!isInitial)
+            OnArrivedAtNode();
+    }
+
+    private void UpdateIdle()
+    {
+        if (_waitingForReady) return;
+
+        // Don't tick timer while a unit-vs-unit battle is active on this node
+        if (_currentEncounterController != null &&
+            _currentEncounterController.GetCurrentEncounterType() == EncounterType.Battle)
             return;
-        }
-
-        if (!_fleeingEncounter && HasConflict())
-        {
-            bool hasOpposingUnits = _currentNode.GetOpposingUnits(_side) > 0;
-
-            if (!hasOpposingUnits && _mode == UnitMode.Patrol && _side == ConflictSide.Immuno
-                && _currentNode != _originNode)
-            {
-                _encounterNode = _currentNode;
-                _fleeingEncounter = true;
-                SwitchToDirectedRecall();
-                return;
-            }
-
-            if (_encounterNode == null && _mode == UnitMode.Patrol && _side == ConflictSide.Immuno
-                && _currentNode != _originNode)
-            {
-                _encounterNode = _currentNode;
-            }
-
-            EnterFighting();
-            return;
-        }
-
-        if (!_fleeingEncounter && HasOpposingNodeOwnership())
-        {
-            if (_mode == UnitMode.Patrol && _side == ConflictSide.Immuno && _currentNode != _originNode)
-            {
-                _encounterNode = _currentNode;
-                _fleeingEncounter = true;
-                SwitchToDirectedRecall();
-                return;
-            }
-        }
-
-        if (_mode == UnitMode.Patrol && IsOriginUnderAttack())
-        {
-            SwitchToDirectedRecall();
-            return;
-        }
 
         if (_waitTimer > 0f)
         {
@@ -262,17 +213,8 @@ public class UnitTravelGroup : MonoBehaviour
             return;
         }
 
-        if (_path.Count > 0)
-        {
-            _nextNode = DequeueNextNode();
-            if (_nextNode != null)
-            {
-                EnterMoving();
-                return;
-            }
-        }
-
-        HandlePathEnd();
+        _waitingForReady = true;
+        OnReadyToMove();
     }
 
     // ──────────────────────────────────────────────
@@ -281,15 +223,10 @@ public class UnitTravelGroup : MonoBehaviour
 
     private void EnterMoving()
     {
-        if (!_fleeingEncounter && HasConflict())
-        {
-            EnterFighting();
-            return;
-        }
-
-        _state = UnitState.Moving;
-        _currentNode.ChangeUnitCount(-_units, _side == ConflictSide.Player);
+        _state = BodyState.Moving;
+        _currentNode.ChangeUnitCount(-_units, _side);
         UnregisterFromNode();
+        UnsubscribeFromEncounter();
         _moveCoroutine = StartCoroutine(PlayMoveAnimation());
     }
 
@@ -326,118 +263,54 @@ public class UnitTravelGroup : MonoBehaviour
         _nextNode = null;
         _moveCoroutine = null;
 
-        _currentNode.ChangeUnitCount(_units, _side == ConflictSide.Player);
+        _currentNode.ChangeUnitCount(_units, _side);
         RegisterOnNode();
+        SubscribeToEncounter();
 
-        EnterWaiting();
+        EnterIdle(false);
+
+        // Notify about existing encounter AFTER state is Idle
+        // so any MoveTo triggered by the brain won't conflict with EnterIdle
+        NotifyExistingEncounter();
     }
 
     // ──────────────────────────────────────────────
-    // Fighting State
+    // Encounter Subscription
     // ──────────────────────────────────────────────
 
-    private void EnterFighting()
+    private void SubscribeToEncounter()
     {
-        _state = UnitState.Fighting;
-        _unitsBeforeBattle = _currentNode.GetUnits(_side);
+        if (_currentNode == null) return;
 
-        if (_mode == UnitMode.Patrol)
-            SwitchToDirectedRecall();
-    }
-
-    private void UpdateFighting()
-    {
-        bool hasOpposingUnits = _currentNode.GetOpposingUnits(_side) > 0;
-        bool hasOpposingBuilding = HasOpposingBuilding(_currentNode);
-        bool hasOwnUnits = _currentNode.GetUnits(_side) > 0;
-
-        if ((hasOpposingUnits || hasOpposingBuilding) && hasOwnUnits)
-            return;
-
-        if (!hasOwnUnits)
+        _currentEncounterController = _currentNode.GetComponent<NodeEncounterController>();
+        if (_currentEncounterController != null)
         {
-            Cleanup();
-            Destroy(gameObject);
-            return;
-        }
-
-        ApplyBattleDamage();
-
-        if (_units <= 0)
-        {
-            Cleanup();
-            Destroy(gameObject);
-            return;
-        }
-
-        if (_encounterNode != null && !_fleeingEncounter)
-            _fleeingEncounter = true;
-
-        EnterWaiting();
-    }
-
-    private void ApplyBattleDamage()
-    {
-        int unitsAfter = _currentNode.GetUnits(_side);
-        int totalDamage = _unitsBeforeBattle - unitsAfter;
-
-        if (totalDamage > 0 && _unitsBeforeBattle > 0)
-        {
-            float damageRatio = (float)totalDamage / _unitsBeforeBattle;
-            _units -= Mathf.RoundToInt(_units * damageRatio);
+            _currentEncounterController.RegisterGroup(this, _side);
+            _currentEncounterController.OnEncounterChanged += HandleEncounterChanged;
         }
     }
 
-    // ──────────────────────────────────────────────
-    // Patrol Recall
-    // ──────────────────────────────────────────────
-
-    private void SwitchToDirectedRecall()
+    private void NotifyExistingEncounter()
     {
-        if (_originNode == null || _currentNode == _originNode)
-            return;
-
-        _mode = UnitMode.Directed;
-
-        var recallPath = PathfindingManager.Instance.GetPath(_currentNode, _originNode);
-        if (recallPath == null || recallPath.Count == 0)
-        {
-            Disband();
-            return;
-        }
-
-        _path = recallPath;
-        DequeueNextNode();
+        if (_currentEncounterController == null) return;
+        var info = _currentEncounterController.GetCurrentEncounterInfo();
+        if (info.Type != EncounterType.None)
+            OnEncounterChanged(info);
     }
 
-    // ──────────────────────────────────────────────
-    // Path End
-    // ──────────────────────────────────────────────
-
-    private void HandlePathEnd()
+    private void UnsubscribeFromEncounter()
     {
-        if (_mode == UnitMode.Patrol)
+        if (_currentEncounterController != null)
         {
-            BaseNode next = PickPatrolNode();
-            if (next != null)
-            {
-                _path.Clear();
-                _path.Add(next);
-                _nextNode = DequeueNextNode();
-                EnterMoving();
-            }
-            else
-            {
-                Disband();
-            }
+            _currentEncounterController.UnregisterGroup(this, _side);
+            _currentEncounterController.OnEncounterChanged -= HandleEncounterChanged;
+            _currentEncounterController = null;
         }
-        else
-        {
-            if (_fleeingEncounter && _encounterNode != null && _originBuilding != null)
-                _originBuilding.OnEncounterReported(_encounterNode, this);
+    }
 
-            Disband();
-        }
+    private void HandleEncounterChanged(EncounterInfo info)
+    {
+        OnEncounterChanged(info);
     }
 
     // ──────────────────────────────────────────────
@@ -461,6 +334,7 @@ public class UnitTravelGroup : MonoBehaviour
     private void Cleanup()
     {
         StopMoveCoroutine();
+        UnsubscribeFromEncounter();
         UnregisterFromNode();
     }
 
@@ -471,42 +345,6 @@ public class UnitTravelGroup : MonoBehaviour
             StopCoroutine(_moveCoroutine);
             _moveCoroutine = null;
         }
-    }
-
-    // ──────────────────────────────────────────────
-    // Conflict Checks
-    // ──────────────────────────────────────────────
-
-    private bool HasConflict()
-    {
-        if (_currentNode == null) return false;
-        if (_currentNode.GetOpposingUnits(_side) > 0) return true;
-        if (HasOpposingBuilding(_currentNode)) return true;
-        return false;
-    }
-
-    private bool HasOpposingBuilding(BaseNode node)
-    {
-        if (node == null) return false;
-        var building = node.GetBuilding();
-        return building != null && building.Side != _side;
-    }
-
-    private bool IsOriginUnderAttack()
-    {
-        if (_originNode == null) return false;
-        return _originNode.GetOpposingUnits(_side) > 0;
-    }
-
-    private bool IsOriginBuildingDestroyed()
-    {
-        return _tracksOriginBuilding && _originBuilding == null;
-    }
-
-    private bool HasOpposingNodeOwnership()
-    {
-        if (_currentNode == null) return false;
-        return _currentNode.GetOwner() != _side;
     }
 
     // ──────────────────────────────────────────────
@@ -523,27 +361,7 @@ public class UnitTravelGroup : MonoBehaviour
         _sphereRenderer.SetPropertyBlock(_materialPropertyBlock);
     }
 
-    private BaseNode DequeueNextNode()
-    {
-        if (_path == null || _path.Count == 0)
-            return null;
-
-        BaseNode node = _path[0];
-        _path.RemoveAt(0);
-        return node;
-    }
-
-    private BaseNode PickPatrolNode()
-    {
-        var neighbours = _currentNode.GetConnectedNodes();
-        if (neighbours == null || neighbours.Count == 0) return null;
-
-        var preferred = neighbours.FindAll(n => n != _previousNode);
-        var candidates = preferred.Count > 0 ? preferred : neighbours;
-        return candidates[Random.Range(0, candidates.Count)];
-    }
-
-    private SplineContainer FindCommonSplineContainer(BaseNode a, BaseNode b)
+    protected SplineContainer FindCommonSplineContainer(BaseNode a, BaseNode b)
     {
         if (a == null || b == null) return null;
 
