@@ -5,6 +5,7 @@ public class EnemyManager : MonoBehaviour
 {
     public static EnemyManager Instance;
     private List<BaseBuilding> _enemyBuildings = new List<BaseBuilding>();
+    private List<TargetGroup> _targetGroups = new List<TargetGroup>();
     private int _maxBuildings = 1;
     private int _currentUnits = 0;
     private int _maxUnits = 30;
@@ -120,6 +121,19 @@ public class EnemyManager : MonoBehaviour
         SpawnBuilding(_buildingPrefab, node);
         return true;
     }
+
+    public void RegisterTargetGroup(TargetGroup group)
+    {
+        if (group != null && !_targetGroups.Contains(group))
+            _targetGroups.Add(group);
+    }
+
+    public void UnregisterTargetGroup(TargetGroup group)
+    {
+        _targetGroups.Remove(group);
+    }
+
+    public List<TargetGroup> GetTargetGroups() => _targetGroups;
 
     public int TryChangeUnits(int change)
     {

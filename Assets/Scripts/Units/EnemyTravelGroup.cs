@@ -2,9 +2,12 @@ using UnityEngine;
 
 public class EnemyTravelGroup : UnitTravelGroup
 {
+    [SerializeField] private GameObject _targetGroupPrefab;
+
     private IEnemyUnitBrain _brain;
     private BaseBuilding _originBuilding;
     private bool _tracksOriginBuilding;
+    private TargetGroup _targetGroup;
 
     public void Setup(int units, BaseNode start, IEnemyUnitBrain brain, BaseBuilding originBuilding = null)
     {
@@ -20,7 +23,35 @@ public class EnemyTravelGroup : UnitTravelGroup
         _brain.Initialize(this, start, originBuilding);
 
         SetupBase(units, start, ConflictSide.Immuno, speed, stepDelay, color);
+        SetupTargetGroup(units);
     }
+
+    private void SetupTargetGroup(int units)
+    {
+        if (_targetGroupPrefab == null) return;
+
+        GameObject go = Instantiate(_targetGroupPrefab, transform.position, Quaternion.identity, transform);
+        _targetGroup = go.GetComponent<TargetGroup>();
+        if (_targetGroup == null)
+            _targetGroup = go.AddComponent<TargetGroup>();
+
+        _targetGroup.SetOwner(this);
+        _targetGroup.SetUnitCount(units);
+        _targetGroup.SpawnTargets();
+    }
+
+    public override void ApplyDamage(int amount)
+    {
+        base.ApplyDamage(amount);
+
+        if (_targetGroup != null)
+        {
+            _targetGroup.SetUnitCount(_units);
+            _targetGroup.SpawnTargets();
+        }
+    }
+
+    public TargetGroup GetTargetGroup() => _targetGroup;
 
     public BaseBuilding GetOriginBuilding() => _originBuilding;
 

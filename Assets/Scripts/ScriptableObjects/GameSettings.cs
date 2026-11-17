@@ -163,6 +163,50 @@ public class GameSettings : ScriptableObject
     public float lymphNodeAlertDuration = 30f;
 
     // ═══════════════════════════════════════════════════════════════════════
+    // TURRET / TARGET GROUP SETTINGS
+    // ═══════════════════════════════════════════════════════════════════════
+    [Header("Turret Settings")]
+
+    [Tooltip("World-space detection radius for defence outpost turrets")]
+    [Min(0.5f)]
+    public float turretRange = 5f;
+
+    [Tooltip("Color of the turret range circle visualization")]
+    public Color turretRangeVisualColor = new Color(1f, 0.3f, 0.3f, 0.6f);
+
+    [Tooltip("Show turret range circle when hovering over DefenceOutpost button")]
+    public bool showTurretRangeOnHover = true;
+
+    [Tooltip("Probability per turret bullet hit to kill 1 enemy unit (0.0 - 1.0)")]
+    [Range(0f, 1f)]
+    public float turretDamageChance = 0.35f;
+
+    [Header("Target Group Settings")]
+
+    [Tooltip("Radius around the group center in which swarm targets wander")]
+    [Min(0.1f)]
+    public float targetGroupWanderRadius = 1.5f;
+
+    [Tooltip("Minimum wander speed for individual swarm targets")]
+    [Min(0.01f)]
+    public float swarmTargetSpeedMin = 0.3f;
+
+    [Tooltip("Maximum wander speed for individual swarm targets")]
+    [Min(0.01f)]
+    public float swarmTargetSpeedMax = 0.8f;
+
+    [Tooltip("SmoothDamp follow time for swarm target visuals (higher = laggier/looser trail)")]
+    [Min(0.01f)]
+    public float swarmTargetFollowSmoothing = 0.2f;
+
+    [Tooltip("Radius the swarm center orbits around a node while the group is idle on it")]
+    [Min(0f)]
+    public float targetGroupOrbitRadius = 1.2f;
+
+    [Tooltip("Angular speed of the swarm center orbit in degrees per second")]
+    public float targetGroupOrbitSpeed = 30f;
+
+    // ═══════════════════════════════════════════════════════════════════════
     // SELECTION SETTINGS
     // ═══════════════════════════════════════════════════════════════════════
     [Header("UI Settings")]

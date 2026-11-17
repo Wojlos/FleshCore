@@ -86,8 +86,10 @@ public class NodeEncounterController : MonoBehaviour
         {
             SetEncounterType(EncounterType.Battle);
 
-            if (building != null)
-                building.SetSieged(true);
+            // Friendly defenders are present, so the building is NOT sieged
+            // during a battle. It only gets sieged when left undefended below.
+            if (building != null && building.IsSieged)
+                building.SetSieged(false);
 
             _conquestTimer = 0f;
             _battleTimer += Time.deltaTime;

@@ -19,7 +19,7 @@ public abstract class UnitTravelGroup : MonoBehaviour
     protected BaseNode _previousNode;
 
     private BaseNode _nextNode;
-    private SplineAnimate _splineAnimator;
+    private SplineFollower _splineFollower;
     private Coroutine _moveCoroutine;
     private float _movementSpeed;
     protected float _stepDelay;
@@ -40,9 +40,9 @@ public abstract class UnitTravelGroup : MonoBehaviour
 
     private void Awake()
     {
-        _splineAnimator = GetComponent<SplineAnimate>();
-        if (_splineAnimator == null)
-            Debug.LogError($"{name}: Missing SplineAnimate component.");
+        _splineFollower = GetComponent<SplineFollower>();
+        if (_splineFollower == null)
+            _splineFollower = gameObject.AddComponent<SplineFollower>();
 
         _materialPropertyBlock = new MaterialPropertyBlock();
 
@@ -105,10 +105,35 @@ public abstract class UnitTravelGroup : MonoBehaviour
     public ConflictSide GetSide() => _side;
     public BodyState GetState() => _state;
 
-    public void ApplyDamage(int amount)
+    public virtual void ApplyDamage(int amount)
     {
         _units -= amount;
         if (_units < 0) _units = 0;
+    }
+
+    // External combat damage (e.g. turret fire). Mirrors the battle accounting so
+    // the node counter and global unit pool stay in sync with the group's units,
+    // preventing leftover counts when the group later leaves the node.
+    public void TakeCombatDamage(int amount)
+    {
+        int actual = Mathf.Min(amount, _units);
+        if (actual <= 0) return;
+
+        if (_state == BodyState.Idle && _isRegisteredOnNode && _currentNode != null)
+        {
+            // Units are counted on the node AND in the global pool: remove from both.
+            _currentNode.DestroyUnits(actual, _side);
+        }
+        else
+        {
+            // Moving / not registered: units exist only in the global pool.
+            if (_side == ConflictSide.Player)
+                ResourceManager.Instance.TryChangeUnits(-actual);
+            else
+                EnemyManager.Instance.TryChangeUnits(-actual);
+        }
+
+        ApplyDamage(actual);
     }
 
     public void Disband()
@@ -138,8 +163,8 @@ public abstract class UnitTravelGroup : MonoBehaviour
     protected void SetupBase(int units, BaseNode startNode, ConflictSide side, float speed, float stepDelay, Color color)
     {
         StopMoveCoroutine();
-        if (_splineAnimator != null)
-            _splineAnimator.Pause();
+        if (_splineFollower != null)
+            _splineFollower.Stop();
 
         _units = units;
         _side = side;
@@ -241,13 +266,10 @@ public abstract class UnitTravelGroup : MonoBehaviour
         }
         else
         {
-            _splineAnimator.Container = container;
-            SetSplineDirection(container, _currentNode.transform.position, _nextNode.transform.position);
-            _splineAnimator.AnimationMethod = SplineAnimate.Method.Speed;
-            _splineAnimator.MaxSpeed = _movementSpeed;
-            _splineAnimator.Play();
+            bool reverse = ShouldReverse(container, _currentNode.transform.position, _nextNode.transform.position);
+            _splineFollower.Play(container, _movementSpeed, reverse);
 
-            while (_splineAnimator.IsPlaying)
+            while (_splineFollower.IsPlaying)
                 yield return null;
 
             transform.position = _nextNode.transform.position;
@@ -379,23 +401,17 @@ public abstract class UnitTravelGroup : MonoBehaviour
         return null;
     }
 
-    private void SetSplineDirection(SplineContainer container, Vector3 fromPos, Vector3 toPos)
+    private bool ShouldReverse(SplineContainer container, Vector3 fromPos, Vector3 toPos)
     {
         if (container == null || container.Splines.Count == 0)
-        {
-            _splineAnimator.NormalizedTime = 0f;
-            return;
-        }
+            return false;
 
         Spline spline = container.Splines[0];
         if (spline == null || spline.Count < 2)
-        {
-            _splineAnimator.NormalizedTime = 0f;
-            return;
-        }
+            return false;
 
-        Vector3 p0 = spline[0].Position;
-        Vector3 p1 = spline[spline.Count - 1].Position;
+        Vector3 p0 = container.transform.TransformPoint(spline[0].Position);
+        Vector3 p1 = container.transform.TransformPoint(spline[spline.Count - 1].Position);
 
         float dFrom0 = (p0 - fromPos).sqrMagnitude;
         float dFrom1 = (p1 - fromPos).sqrMagnitude;
@@ -403,9 +419,6 @@ public abstract class UnitTravelGroup : MonoBehaviour
         float dTo1 = (p1 - toPos).sqrMagnitude;
 
         bool forward = (dFrom0 + dTo1) <= (dFrom1 + dTo0);
-        if (!forward)
-            container.ReverseFlow(0);
-
-        _splineAnimator.NormalizedTime = 0f;
+        return !forward;
     }
 }

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a12471cd06d2624c9c6aabe8a711f2d, type: 3}
   m_Name: GameSettings1
   m_EditorClassIdentifier: Assembly-CSharp::GameSettings
-  startingMaxBuildings: 100
-  startingMaxUnits: 10
+  startingMaxBuildings: 3
+  startingMaxUnits: 15
   startingResources:
   - type: 0
     cost: 4
@@ -22,7 +22,7 @@ MonoBehaviour:
   - type: 2
     cost: 4
   startingPlayerUnits: 20
-  minLymphNodeDistanceFromPlayer: 3
+  minLymphNodeDistanceFromPlayer: 4
   pumpMaxBuildingIncrease: 3
   playerBuildingSettings:
   - type: 0
@@ -92,12 +92,22 @@ MonoBehaviour:
   enemySpeedMax: 3
   playerUnitGroupColor: {r: 0, g: 0, b: 0.5, a: 1}
   immunoUnitGroupColor: {r: 0.5, g: 0.5, b: 0, a: 1}
-  maxImmunoBuildings: 1
+  maxImmunoBuildings: 0
   maxStartImmunoUnits: 30
   maxImmunoPatroleGroups: 1
   immunoUnitsToSpawnLymphNode: 15
   minPatroleSize: 10
   lymphNodeAlertDuration: 30
+  turretRange: 10
+  turretRangeVisualColor: {r: 1, g: 0.3, b: 0.3, a: 0.6}
+  showTurretRangeOnHover: 1
+  turretDamageChance: 0.35
+  targetGroupWanderRadius: 1.5
+  swarmTargetSpeedMin: 0.3
+  swarmTargetSpeedMax: 0.8
+  swarmTargetFollowSmoothing: 0.2
+  targetGroupOrbitRadius: 1.2
+  targetGroupOrbitSpeed: 30
   tooltipHoverDelay: 0.1
   minSelectionCoverageThreshold: 0
   selectionSamplePointsPerRadius: 8

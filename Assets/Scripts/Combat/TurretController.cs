@@ -120,15 +120,28 @@ public class TurretController : MonoBehaviour
 
     private void EvaluateState()
     {
-        if (_currentState == TurretState.Deactivated) return;
+        if (_currentState == TurretState.Deactivated)
+        {
+            return;
+        }
 
-        // Clean null refs
         _targets.RemoveAll(t => t == null);
 
-        if (_targets.Count > 0 && _currentState != TurretState.Engaged)
-            TransitionToEngaged();
-        else if (_targets.Count == 0 && _currentState != TurretState.Searching)
+        if (_targets.Count > 0)
+        {
+            if (_currentState != TurretState.Engaged)
+            {
+                TransitionToEngaged();
+            }
+            else if (_currentTarget == null)
+            {
+                _currentTarget = _targets[Random.Range(0, _targets.Count)];
+            }
+        }
+        else if (_currentState != TurretState.Searching)
+        {
             TransitionToSearching();
+        }
     }
 
     private void TransitionToSearching()
@@ -211,7 +224,19 @@ public class TurretController : MonoBehaviour
     {
         if (_currentTarget == null)
         {
-            EvaluateState();
+            _targets.RemoveAll(t => t == null);
+            if (_targets.Count > 0)
+            {
+                _currentTarget = _targets[Random.Range(0, _targets.Count)];
+                if (_fireCoroutine == null)
+                {
+                    _fireCoroutine = StartCoroutine(FireRoutine());
+                }
+            }
+            else
+            {
+                TransitionToSearching();
+            }
             return;
         }
 
@@ -234,7 +259,7 @@ public class TurretController : MonoBehaviour
 
             for (int i = 0; i < _burstCount; i++)
             {
-                if (_currentTarget == null) yield break;
+                if (_currentTarget == null) break;
                 if (!IsAlignedWithTarget()) break;
                 FireBullet();
                 if (i < _burstCount - 1)
@@ -274,7 +299,17 @@ public class TurretController : MonoBehaviour
             TurretBullet bullet = bulletObj.GetComponent<TurretBullet>();
             if (bullet != null)
             {
-                bullet.Initialize(targetPos, _bulletSpeed);
+                UnitTravelGroup targetOwner = null;
+                var swarmTarget = _currentTarget.GetComponent<SwarmTarget>();
+                if (swarmTarget != null && swarmTarget.GetGroup() != null)
+                    targetOwner = swarmTarget.GetGroup().GetOwner();
+
+                float damageChance = 0f;
+                var settings = GameManager.Instance != null ? GameManager.Instance.GetGameSettings() : null;
+                if (settings != null)
+                    damageChance = settings.turretDamageChance;
+
+                bullet.Initialize(targetPos, _bulletSpeed, targetOwner, damageChance);
             }
         }
     }

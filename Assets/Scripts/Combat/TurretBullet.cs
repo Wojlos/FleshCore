@@ -8,10 +8,15 @@ public class TurretBullet : MonoBehaviour
     private float _speed;
     private bool _initialized = false;
 
-    public void Initialize(Vector2 targetPosition, float speed)
+    private UnitTravelGroup _targetOwner;
+    private float _damageChance;
+
+    public void Initialize(Vector2 targetPosition, float speed, UnitTravelGroup targetOwner = null, float damageChance = 0f)
     {
         _targetPosition = targetPosition;
         _speed = speed;
+        _targetOwner = targetOwner;
+        _damageChance = damageChance;
         _initialized = true;
     }
 
@@ -40,6 +45,12 @@ public class TurretBullet : MonoBehaviour
         if (_hitEffectPrefab != null)
         {
             Instantiate(_hitEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        // Probability-based damage on impact, mirroring unit-vs-unit combat.
+        if (_targetOwner != null && Random.value <= _damageChance)
+        {
+            _targetOwner.TakeCombatDamage(1);
         }
 
         Destroy(gameObject);
